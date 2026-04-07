@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --saffron:#E8A317; --navy:#0F1B2D; --stone:#F5F0EB; }
+* { scrollbar-width: thin; scrollbar-color: #243352 #0A1220; }
+html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+body { font-family: 'DM Sans', sans-serif; transition: background-color 0.5s ease, color 0.5s ease; }
+
+.grid-bg {
+    background-image: linear-gradient(rgba(46,64,104,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(46,64,104,0.12) 1px, transparent 1px);
+    background-size: 60px 60px;
+}
+
+@keyframes gridShift { to { background-position: 60px 60px; } }
+.grid-bg-animated { animation: gridShift 25s linear infinite; }
+
+.pulse-dot { animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(1.6)} }
+
+.reveal { opacity:0; transform:translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+.gauge-glow { filter: drop-shadow(0 0 18px rgba(232,163,23,0.25)); }
+
+/* Dark Mode overrides */
+.dark-mode { background-color: #070D18; color: #FAF7F4; }
+.dark-mode .bg-stone-100 { background-color: #0A1220; }
+.dark-mode .bg-white { background-color: #0F1B2D; border-color: #1A2640; color: #FAF7F4; }
+.dark-mode .text-navy-900 { color: #FAF7F4; }
+.dark-mode .text-navy-800 { color: #E8E0D6; }
+.dark-mode .text-stone-500 { color: #B8A99A; }
+.dark-mode .border-stone-200 { border-color: #1A2640; }
+.dark-mode .bg-stone-50 { background-color: #070D18; }
+.dark-mode select { color: #FAF7F4; background-color: #0F1B2D; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.resolved-stamp { position:absolute; top:10px; right:10px; border:3px solid #22C55E; color:#22C55E; padding:1px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; transform:rotate(4deg); letter-spacing:0.5px; }
