@@ -4,7 +4,7 @@ import { MapPin, Check, Upload, Shield, Satellite, FileText, Search, Wrench, Cir
 import axios from 'axios';
 
 const ReportIssue = () => {
-    const { language, showToast, API_BASE, fetchIssues } = useContext(AppContext);
+    const { showToast, API_BASE, fetchIssues } = useContext(AppContext);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         category: '',
@@ -19,16 +19,14 @@ const ReportIssue = () => {
     const [trackingId, setTrackingId] = useState(null);
 
     const categories = [
-        { id: 'Roads', en: 'Roads', hi: 'सड़कें', mr: 'रस्ते', icon: 'road' },
-        { id: 'Water Supply', en: 'Water', hi: 'पानी', mr: 'पाणी', icon: 'droplet' },
-        { id: 'Electricity', en: 'Electricity', hi: 'बिजली', mr: 'वीज', icon: 'bolt' },
-        { id: 'Sanitation', en: 'Sanitation', hi: 'स्वच्छता', mr: 'स्वच्छता', icon: 'trash' },
-        { id: 'Public Safety', en: 'Safety', hi: 'सुरक्षा', mr: 'सुरक्षा', icon: 'shield' }
+        { id: 'Roads', name: 'Roads', icon: 'road' },
+        { id: 'Water Supply', name: 'Water', icon: 'droplet' },
+        { id: 'Electricity', name: 'Electricity', icon: 'bolt' },
+        { id: 'Sanitation', name: 'Sanitation', icon: 'trash' },
+        { id: 'Public Safety', name: 'Safety', icon: 'shield' }
     ];
 
     const priorities = ['Low', 'Medium', 'High', 'Emergency'];
-
-    const getT = (item) => item[language] || item.en;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -72,7 +70,7 @@ const ReportIssue = () => {
                 <div className="reveal visible mb-12 text-center lg:text-left">
                     <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-600 font-black mb-2 block">Intelligence Input</span>
                     <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-navy-900 dark:text-stone-50 leading-tight">
-                        {language === 'hi' ? 'नागरिक रिपोर्टिंग' : language === 'mr' ? 'नागरिक अहवाल' : 'Citizen Reporting Portal'}
+                        Citizen Reporting Portal
                     </h2>
                 </div>
 
@@ -88,7 +86,7 @@ const ReportIssue = () => {
                                 <div className="flex flex-wrap gap-2">
                                     {categories.map(cat => (
                                         <button key={cat.id} type="button" onClick={() => setFormData({...formData, category: cat.id})} className={`px-4 py-3 text-[10px] font-mono font-bold rounded-xl border transition-all flex items-center gap-2 ${formData.category === cat.id ? 'bg-saffron-500 border-saffron-600 text-navy-900 shadow-lg shadow-saffron-500/20 active:scale-95' : 'bg-stone-50 dark:bg-navy-900 border-stone-200 dark:border-navy-700 text-stone-600 dark:text-stone-400 hover:border-saffron-500/50'}`}>
-                                            {getT(cat)}
+                                            {cat.name}
                                         </button>
                                     ))}
                                 </div>

@@ -7,13 +7,13 @@ import { Doughnut } from 'react-chartjs-2';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Hero = () => {
-    const { language, issues, projects } = useContext(AppContext);
+    const { issues, projects } = useContext(AppContext);
 
     const stats = [
-        { label: language === 'en' ? 'Issues Reported' : language === 'hi' ? 'रिपोर्ट की गई समस्याएं' : 'नोंदवलेल्या तक्रारी', target: issues?.length || 847, color: 'text-stone-50' },
-        { label: language === 'en' ? 'Issues Resolved' : language === 'hi' ? 'सुलझाई गई समस्याएं' : 'सोडवलेल्या तक्रारी', target: 612, color: 'text-emerald-400' },
-        { label: language === 'en' ? 'Active Projects' : language === 'hi' ? 'सक्रिय परियोजनाएं' : 'सक्रिय प्रकल्प', target: projects?.length || 5, color: 'text-saffron-400' },
-        { label: language === 'en' ? 'Accuracy Score' : language === 'hi' ? 'सटीकता स्कोर' : 'अचूकता स्कोर', target: 72, color: 'text-stone-50', suffix: '%' }
+        { label: 'Issues Reported', target: issues?.length || 847, color: 'text-stone-50' },
+        { label: 'Issues Resolved', target: 612, color: 'text-emerald-400' },
+        { label: 'Active Projects', target: projects?.length || 5, color: 'text-saffron-400' },
+        { label: 'Accuracy Score', target: 72, color: 'text-stone-50', suffix: '%' }
     ];
 
     const gaugeData = {
@@ -47,16 +47,16 @@ const Hero = () => {
                 <div className="grid lg:grid-cols-5 gap-12 items-center w-full">
                     <div className="lg:col-span-3 text-center lg:text-left">
                         <h1 className="font-display font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-stone-50 leading-[0.95] tracking-tight mb-4">
-                            <span>{language === 'mr' ? 'प्रभाग' : 'Ward'} <span className="text-saffron-400">{language === 'mr' ? '१४' : '14'}</span></span>
+                            <span>Ward <span className="text-saffron-400">14</span></span>
                         </h1>
                         <p className="font-display text-xl sm:text-2xl text-stone-300/80 mb-6 italic">
                             Dharampeth, Nagpur
                         </p>
 
                         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-stone-400 mb-8 justify-center lg:justify-start">
-                            <span className="flex items-center gap-2"><UserCheck className="w-4 h-4 text-saffron-500/60" /> {language === 'en' ? 'Councillor' : language === 'hi' ? 'पार्षद' : 'नगरसेवक'}: Smt. Priya Deshmukh</span>
-                            <span className="flex items-center gap-2"><Users className="w-4 h-4 text-saffron-500/60" /> {language === 'en' ? 'Population' : language === 'hi' ? 'जनसंख्या' : 'लोकसंख्या'}: ~48,200</span>
-                            <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-saffron-500/60" /> {language === 'en' ? 'Last sync: 3 min ago' : 'हालिया सिंक: 3 मिनट पहले'}</span>
+                            <span className="flex items-center gap-2"><UserCheck className="w-4 h-4 text-saffron-500/60" /> Councillor: Smt. Priya Deshmukh</span>
+                            <span className="flex items-center gap-2"><Users className="w-4 h-4 text-saffron-500/60" /> Population: ~48,200</span>
+                            <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-saffron-500/60" /> Last sync: 3 min ago</span>
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

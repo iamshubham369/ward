@@ -9,8 +9,6 @@ const ProjectGenesisModal = ({ isOpen, onClose }) => {
 
     const [form, setForm] = useState({
         name_en: '',
-        name_hi: '',
-        name_mr: '',
         category: 'Roads',
         dept_en: '',
         budget: '',
@@ -21,49 +19,7 @@ const ProjectGenesisModal = ({ isOpen, onClose }) => {
         lng: 79.088
     });
 
-    // --- STRATEGIC LINGUISTIC SYNCHRONIZATION ---
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (form.name_en.length > 2) {
-                const dict = {
-                    'hi': { 
-                        'Road': 'सड़क', 'Street': 'मार्ग', 'Main': 'मुख्य', 'Resurfacing': 'डामरीकरण', 
-                        'Pipeline': 'पाइपलाइन', 'Water': 'जल', 'Supply': 'आपूर्ति', 'New': 'नयी',
-                        'Construction': 'निर्माण', 'Repair': 'मरम्मत', 'Park': 'उद्यान', 'Garden': 'बगीचा',
-                        'Maintenance': 'रखरखाव', 'Lighting': 'प्रकाश', 'Drainage': 'जल निकासी'
-                    },
-                    'mr': { 
-                        'Road': 'रस्ता', 'Street': 'मार्ग', 'Main': 'मुख्य', 'Resurfacing': 'डांबरीकरण', 
-                        'Pipeline': 'पाईपलाईन', 'Water': 'पाणी', 'Supply': 'पुरवठा', 'New': 'नवीन',
-                        'Construction': 'बांधकाम', 'Repair': 'दुरुस्ती', 'Park': 'उद्यान', 'Garden': 'बाग',
-                        'Maintenance': 'देखभाल', 'Lighting': 'दिवे', 'Drainage': 'सांडपाणी'
-                    }
-                };
-                
-                const translate = (text, lang) => {
-                    let result = text;
-                    Object.keys(dict[lang]).forEach(word => {
-                        result = result.replace(new RegExp(word, 'gi'), dict[lang][word]);
-                    });
-                    return result;
-                };
-
-                setForm(prev => {
-                    const newHi = translate(prev.name_en, 'hi');
-                    const newMr = translate(prev.name_en, 'mr');
-                    
-                    // Only update if current field is empty or already a mock translation
-                    return {
-                        ...prev,
-                        name_hi: (!prev.name_hi || prev.name_hi.includes('Verifying')) ? newHi : prev.name_hi,
-                        name_mr: (!prev.name_mr || prev.name_mr.includes('Verifying')) ? newMr : prev.name_mr
-                    };
-                });
-            }
-        }, 800); // 800ms debounce protocol
-
-        return () => clearTimeout(timer);
-    }, [form.name_en]);
+    // Translations are now fully handled natively by the Google Translate API widget.
 
     if (!isOpen) return null;
 
@@ -72,13 +28,15 @@ const ProjectGenesisModal = ({ isOpen, onClose }) => {
         setLoading(true);
         const success = await addProject({
             ...form,
+            name_hi: form.name_en,
+            name_mr: form.name_en,
             budget: parseFloat(form.budget),
             lat: parseFloat(form.lat),
             lng: parseFloat(form.lng)
         });
         if (success) {
             onClose();
-            setForm({ name_en: '', name_hi: '', name_mr: '', category: 'Roads', dept_en: '', budget: '', start_date: '', deadline: '', contractor: '', lat: 21.145, lng: 79.088 });
+            setForm({ name_en: '', category: 'Roads', dept_en: '', budget: '', start_date: '', deadline: '', contractor: '', lat: 21.145, lng: 79.088 });
         }
         setLoading(false);
     };
@@ -108,18 +66,8 @@ const ProjectGenesisModal = ({ isOpen, onClose }) => {
                         <h4 className="text-[10px] font-mono font-black text-stone-400 uppercase tracking-[0.3em] mb-2 border-b border-stone-100 dark:border-navy-800 pb-2">Identification Node</h4>
                         <div className="space-y-4">
                             <div>
-                                <label className={labelClasses}>Project Name (English)</label>
+                                <label className={labelClasses}>Project Name</label>
                                 <input type="text" value={form.name_en} onChange={e => setForm({...form, name_en: e.target.value})} required placeholder="e.g. MG Road Resurfacing" className={inputClasses} />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className={labelClasses}>Project Name (Hindi)</label>
-                                    <input type="text" value={form.name_hi} onChange={e => setForm({...form, name_hi: e.target.value})} required placeholder="नाम (हिंदी)" className={inputClasses} />
-                                </div>
-                                <div>
-                                    <label className={labelClasses}>Project Name (Marathi)</label>
-                                    <input type="text" value={form.name_mr} onChange={e => setForm({...form, name_mr: e.target.value})} required placeholder="नाव (मराठी)" className={inputClasses} />
-                                </div>
                             </div>
                         </div>
 

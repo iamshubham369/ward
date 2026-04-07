@@ -3,13 +3,7 @@ import { AppContext } from '../../context/AppContext';
 import { Plus, Calendar, IndianRupee, HardHat, TrendingUp, AlertTriangle, CheckCircle2, ChevronRight, BarChart3, Clock } from 'lucide-react';
 
 const OngoingProjects = ({ onOpenModal }) => {
-    const { projects, language, user, setView, setSelectedProjectId } = useContext(AppContext);
-
-    const getTranslation = (item) => {
-        if (language === 'hi') return item.name_hi || item.name_en;
-        if (language === 'mr') return item.name_mr || item.name_en;
-        return item.name_en;
-    };
+    const { projects, user, setView, setSelectedProjectId } = useContext(AppContext);
 
     return (
         <section id="projects" className="bg-stone-100 dark:bg-navy-950 py-16 md:py-24 border-b border-stone-200 dark:border-navy-800">
@@ -30,7 +24,7 @@ const OngoingProjects = ({ onOpenModal }) => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 reveal visible">
                     {projects.map((project, idx) => (
-                        <ProjectCard key={project.id} project={project} name={getTranslation(project)} />
+                        <ProjectCard key={project.id} project={project} name={project.name_en} />
                     ))}
                 </div>
             </div>

@@ -7,7 +7,7 @@ const ProjectModal = ({ isOpen, onClose }) => {
     const { language, API_BASE, fetchProjects, showToast } = useContext(AppContext);
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        name_en: '', name_hi: '', name_mr: '', category: 'Roads', dept_en: '', budget: '', start_date: '', deadline: '', contractor: ''
+        name_en: '', category: 'Roads', dept_en: '', budget: '', start_date: '', deadline: '', contractor: ''
     });
 
     if (!isOpen) return null;
@@ -16,11 +16,15 @@ const ProjectModal = ({ isOpen, onClose }) => {
         e.preventDefault();
         setLoading(true);
         try {
-            await axios.post(`${API_BASE}/projects`, formData);
+            await axios.post(`${API_BASE}/projects`, {
+                ...formData,
+                name_hi: formData.name_en, // Auto-filling to avoid backend null constraints
+                name_mr: formData.name_en
+            });
             showToast('Strategic Deployment Successful', 'success');
             fetchProjects();
             onClose();
-            setFormData({ name_en: '', name_hi: '', name_mr: '', category: 'Roads', dept_en: '', budget: '', start_date: '', deadline: '', contractor: '' });
+            setFormData({ name_en: '', category: 'Roads', dept_en: '', budget: '', start_date: '', deadline: '', contractor: '' });
         } catch (err) {
             showToast('System Error: Sync Failed', 'error');
         } finally {
@@ -42,10 +46,8 @@ const ProjectModal = ({ isOpen, onClose }) => {
                     <button onClick={onClose} className="p-3 rounded-full hover:bg-stone-100 dark:hover:bg-navy-800 text-stone-400 hover:text-navy-900 dark:hover:text-stone-100 transition-all active:scale-95 border border-transparent hover:border-stone-200 dark:hover:border-navy-700 shadow-sm"><X className="w-6 h-6" /></button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-10 space-y-10">
-                    <div className="grid sm:grid-cols-3 gap-6">
-                        <InputGroup label="Name (EN)" val={formData.name_en} set={v => setFormData({...formData, name_en: v})} />
-                        <InputGroup label="Name (HI)" val={formData.name_hi} set={v => setFormData({...formData, name_hi: v})} />
-                        <InputGroup label="Name (MR)" val={formData.name_mr} set={v => setFormData({...formData, name_mr: v})} />
+                    <div className="grid sm:grid-cols-2 gap-6">
+                        <InputGroup label="Project Name" val={formData.name_en} set={v => setFormData({...formData, name_en: v})} />
                     </div>
 
                     <div className="grid sm:grid-cols-2 gap-10">

@@ -3,18 +3,6 @@ import { AppContext } from '../../context/AppContext';
 import { Wind, CloudSun, Calendar, Phone, Trophy, UserPlus, ExternalLink, Zap, Clock } from 'lucide-react';
 
 const WardHub = () => {
-    const { language } = useContext(AppContext);
-
-    const translations = {
-        title: { en: 'Ward Command Center', hi: 'वार्ड कमांड सेंटर', mr: 'प्रभाग नियंत्रण केंद्र' },
-        subtitle: { en: 'Tactical Dashboard', hi: 'सामरिक डैशबोर्ड', mr: 'सामरिक डॅशबोर्ड' },
-        calendar: { en: 'Activity Calendar', hi: 'गतिविधि कैलेंडर', mr: 'कार्यक्रम कॅलेंडर' },
-        directory: { en: 'Official Directory', hi: 'आधिकारिक निर्देशिका', mr: 'अधिकृत मार्गदर्शिका' },
-        leaderboard: { en: 'Civic Leaderboard', hi: 'नागरिक लीडरबोर्ड', mr: 'नागरिक लीडरबोर्ड' },
-        volunteer: { en: 'Volunteer Force', hi: 'स्वयंसेवक बल', mr: 'स्वयंसेवक दल' }
-    };
-
-    const getT = (key) => translations[key][language] || translations[key].en;
 
     const events = [
         { day: '12', month: 'Jul', title: 'Public Health Awareness Camp', time: '09:00 AM', location: 'Community Hall' },
@@ -28,9 +16,9 @@ const WardHub = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                     <div className="text-center md:text-left">
-                        <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-400 font-semibold mb-2 block">{getT('subtitle')}</span>
+                        <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-400 font-semibold mb-2 block">Tactical Dashboard</span>
                         <h2 className="font-display font-black text-3xl sm:text-4xl md:text-5xl text-stone-50 leading-tight">
-                            {getT('title')}
+                            Ward Command Center
                         </h2>
                     </div>
                     <div className="flex items-center justify-center gap-4">
@@ -81,7 +69,7 @@ const WardHub = () => {
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                                 <h3 className="font-display font-bold text-lg text-stone-50 flex items-center gap-3">
                                     <Calendar className="w-5 h-5 text-saffron-400" />
-                                    {getT('calendar')}
+                                    Activity Calendar
                                 </h3>
                                 <button className="text-[10px] font-mono text-saffron-500 hover:text-saffron-400 hover:underline uppercase transition-all">View All Protocols</button>
                             </div>
@@ -106,7 +94,7 @@ const WardHub = () => {
                     {/* Meta Section */}
                     <div className="space-y-4">
                         <div className="bg-navy-800/80 backdrop-blur border border-navy-700 p-5 rounded-2xl shadow-xl hover:border-saffron-500/30 transition-all group">
-                            <h3 className="text-[10px] font-mono font-black text-stone-100 uppercase mb-4 flex items-center justify-between tracking-widest">{getT('directory')} <Phone className="w-3 h-3 text-saffron-500" /></h3>
+                            <h3 className="text-[10px] font-mono font-black text-stone-100 uppercase mb-4 flex items-center justify-between tracking-widest">Official Directory <Phone className="w-3 h-3 text-saffron-500" /></h3>
                             <div className="space-y-3">
                                 <div className="flex items-center gap-3 p-2 rounded-lg bg-navy-900/50 hover:bg-navy-700 transition-colors cursor-pointer border border-transparent hover:border-navy-600">
                                     <div className="w-8 h-8 rounded-full bg-navy-700 border border-navy-600 flex items-center justify-center text-[10px] font-black text-stone-300">PD</div>
@@ -126,7 +114,7 @@ const WardHub = () => {
                         </div>
                         <div className="bg-gradient-to-br from-saffron-600 to-orange-600 p-5 rounded-2xl shadow-2xl active:scale-[0.98] cursor-pointer transition-all hover:rotate-1 group relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12 blur-2xl"></div>
-                            <h3 className="text-[11px] font-mono font-black text-navy-900 uppercase tracking-widest">{getT('volunteer')}</h3>
+                            <h3 className="text-[11px] font-mono font-black text-navy-900 uppercase tracking-widest">Volunteer Force</h3>
                             <p className="text-[10px] text-navy-900/80 font-bold mt-1 max-w-[80%] leading-relaxed">Join 400+ citizens supporting ward initiatives.</p>
                             <div className="mt-4 flex items-center justify-between">
                                 <div className="flex -space-x-1.5 font-bold">

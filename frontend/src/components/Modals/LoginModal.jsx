@@ -185,32 +185,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                         )}
                     </form>
 
-                    {/* Strategic Demo Credentials */}
-                    <div className="mt-8 border-t border-navy-500/10 pt-8">
-                        <div className="bg-navy-900/5 dark:bg-navy-900/40 p-6 rounded-2xl border border-dashed border-navy-500/20">
-                            <p className="text-[9px] font-mono font-black text-stone-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <ShieldQuestion className="w-3 h-3 text-saffron-500" /> Simulation Access Overrides
-                            </p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <button 
-                                    type="button" 
-                                    onClick={() => { setEmail('citizen@ward14.in'); setPassword('citizen123'); }}
-                                    className="text-left group"
-                                >
-                                    <p className="text-[8px] font-mono font-bold text-stone-500 uppercase tracking-tighter group-hover:text-saffron-500 transition-colors">Citizen Identity</p>
-                                    <p className="text-[10px] font-mono font-black text-navy-900 dark:text-stone-300 break-all">citizen@ward14.in / citizen123</p>
-                                </button>
-                                <button 
-                                    type="button" 
-                                    onClick={() => { setEmail('admin@ward14.in'); setPassword('admin123'); }}
-                                    className="text-left group"
-                                >
-                                    <p className="text-[8px] font-mono font-bold text-stone-500 uppercase tracking-tighter group-hover:text-saffron-500 transition-colors">Authority Hub</p>
-                                    <p className="text-[10px] font-mono font-black text-navy-900 dark:text-stone-300 break-all">admin@ward14.in / admin123</p>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+
 
                     {/* Navigation Nodes */}
                     <div className="mt-8 flex flex-col items-center gap-4">

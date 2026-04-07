@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { AppProvider, AppContext } from './context/AppContext';
-import { translations } from './translations';
 import Navbar from './components/Layout/Navbar';
 import Hero from './components/Sections/Hero';
 import AdminPortal from './components/Sections/AdminPortal';
@@ -62,7 +61,7 @@ const AppContent = () => {
                             <div className="flex items-center gap-4 min-w-0">
                                 <div className="p-2 bg-navy-900 rounded-xl shadow-lg animate-pulse"><Bell className="w-4 h-4 text-saffron-400" /></div>
                                 <p className="text-xs font-black uppercase tracking-wider truncate italic">
-                                    {translations.emergency[language]}
+                                    Flash Flood Warning: Evacuate low-lying areas in Sector 7 immediately. Emergency Response Teams activated.
                                 </p>
                             </div>
                             <button onClick={() => setIsEmergencyVisible(false)} className="shrink-0 p-2 hover:bg-navy-900/10 rounded-xl transition-all border border-transparent hover:border-navy-900/20"><X className="w-4 h-4" /></button>

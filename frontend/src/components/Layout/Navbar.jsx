@@ -1,28 +1,59 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../../context/AppContext';
-import { Moon, Sun, Search, LogOut, ShieldCheck, User, Menu, X, ChevronDown } from 'lucide-react';
+import { Moon, Sun, Search, LogOut, ShieldCheck, User, Menu, X, ChevronDown, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { translations } from '../../translations';
 
 const Navbar = ({ onOpenLogin }) => {
-    const { language, setLanguage, darkMode, setDarkMode, user, logout, view, setView } = useContext(AppContext);
+    const { darkMode, setDarkMode, user, logout, view, setView } = useContext(AppContext);
+    const getInitialLang = () => document.cookie.includes('googtrans=') ? document.cookie.split('googtrans=/en/')[1]?.split(';')[0] || 'en' : 'en';
+    const [language, setLanguage] = useState(getInitialLang());
     const [mobileOpen, setMobileOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
     const [isMoreOpen, setIsMoreOpen] = useState(false);
+    const [langMenuOpen, setLangMenuOpen] = useState(false);
 
     const toggleTheme = () => setDarkMode(!darkMode);
 
+    const handleLanguageChange = (lang) => {
+        setLanguage(lang);
+        try {
+            const combo = document.querySelector('.goog-te-combo');
+            if (combo) {
+                combo.value = lang;
+                if (document.createEvent) {
+                    const event = document.createEvent('HTMLEvents');
+                    event.initEvent('change', true, true);
+                    combo.dispatchEvent(event);
+                } else {
+                    combo.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            } else {
+                console.warn('Translate combo not found. Applying cookie directly.');
+                if (lang === 'en') {
+                    document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                    document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + location.hostname;
+                } else {
+                    document.cookie = `googtrans=/en/${lang}; path=/`;
+                    document.cookie = `googtrans=/en/${lang}; path=/; domain=` + location.hostname;
+                }
+                window.location.reload();
+            }
+        } catch (e) {
+            console.error('Google Translate sync failed:', e);
+        }
+    };
+
     const NavItems = [
-        { id: 'hero', key: 'overview' },
-        ...(user?.role === 'Authority' ? [{ id: 'admin-portal', key: 'adminPortal' }] : []),
-        ...(!user || user.role === 'Citizen' ? [{ id: 'report', key: 'report' }] : []),
-        { id: 'buzz', key: 'buzz' },
-        { id: 'projects', key: 'projects' },
+        { id: 'hero', label: 'Overview' },
+        ...(user?.role === 'Authority' ? [{ id: 'admin-portal', label: 'Admin Portal' }] : []),
+        ...(!user || user.role === 'Citizen' ? [{ id: 'report', label: 'Report Issue' }] : []),
+        { id: 'buzz', label: 'Ward Buzz' },
+        { id: 'projects', label: 'Projects' },
     ];
 
     const MoreItems = [
-        { id: 'accuracy', key: 'scorecard' },
-        { id: 'archive', key: 'Archive' },
+        { id: 'accuracy', label: 'Scorecard' },
+        { id: 'archive', label: 'Archive' },
     ];
 
     // Active Section Tracking Protocol
@@ -43,10 +74,6 @@ const Navbar = ({ onOpenLogin }) => {
 
         return () => observer.disconnect();
     }, [view]);
-
-    const getTranslation = (item) => {
-        return translations[item.key] ? (translations[item.key][language] || translations[item.key].en) : item.key;
-    };
 
     return (
         <nav id="main-nav" className="fixed top-0 left-0 right-0 z-[9999] bg-navy-800/95 border-b border-navy-600/30 shadow-2xl backdrop-blur-xl transition-all duration-500">
@@ -73,7 +100,7 @@ const Navbar = ({ onOpenLogin }) => {
                                 onClick={() => setView('map')}
                                 className={`px-4 py-2 text-[10px] font-mono font-black transition-all uppercase tracking-widest relative group/nav ${activeSection === item.id ? 'text-saffron-500' : 'text-stone-300/80 hover:text-white'}`}
                             >
-                                {getTranslation(item)}
+                                {item.label}
                                 {activeSection === item.id && (
                                     <motion.div layoutId="nav-active" className="absolute bottom-0 left-4 right-4 h-0.5 bg-saffron-500" />
                                 )}
@@ -103,7 +130,7 @@ const Navbar = ({ onOpenLogin }) => {
                                                 onClick={() => { setView('map'); setIsMoreOpen(false); }}
                                                 className="block px-4 py-3 text-[9px] font-mono font-black text-stone-400 hover:text-saffron-500 hover:bg-navy-800 rounded-lg uppercase tracking-widest transition-all"
                                             >
-                                                {getTranslation(item)}
+                                                {item.label}
                                             </a>
                                         ))}
                                     </motion.div>
@@ -123,12 +150,63 @@ const Navbar = ({ onOpenLogin }) => {
                         {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                     </button>
 
-                    <div className="flex bg-navy-900 rounded-lg p-0.5 border border-navy-600 shadow-inner">
-                        {['en', 'hi', 'mr'].map(lang => (
-                            <button key={lang} onClick={() => setLanguage(lang)} className={`px-2.5 py-1 text-[9px] font-mono font-bold rounded transition-all cursor-pointer ${language === lang ? 'bg-saffron-500 text-navy-900' : 'text-stone-500 hover:text-stone-200'}`}>
-                                {lang.toUpperCase()}
-                            </button>
-                        ))}
+                    <div className="relative notranslate">
+                        <button 
+                            onClick={() => setLangMenuOpen(!langMenuOpen)}
+                            className="flex items-center gap-2 px-3 py-2 bg-navy-900 border border-navy-600 rounded-lg hover:border-saffron-500 transition-all shadow-inner group cursor-pointer"
+                        >
+                            <Globe className="w-4 h-4 text-stone-400 group-hover:text-saffron-500 transition-colors" />
+                            <span className="text-[10px] font-mono font-bold text-stone-300 uppercase tracking-widest">
+                                {
+                                    [
+                                        { code: 'en', label: 'English' },
+                                        { code: 'hi', label: 'हिंदी' },
+                                        { code: 'mr', label: 'मराठी' },
+                                        { code: 'gu', label: 'ગુજરાતી' },
+                                        { code: 'ta', label: 'தமிழ்' },
+                                        { code: 'te', label: 'తెలుగు' },
+                                        { code: 'bn', label: 'বাংলা' },
+                                        { code: 'ur', label: 'اردو' }
+                                    ].find(l => l.code === (language || 'en'))?.label || 'English'
+                                }
+                            </span>
+                            <ChevronDown className={`w-3 h-3 text-stone-500 transition-transform ${langMenuOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        
+                        <AnimatePresence>
+                            {langMenuOpen && (
+                                <motion.div 
+                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute top-full right-0 mt-2 w-36 bg-navy-900/95 backdrop-blur-xl border border-navy-600 rounded-xl shadow-2xl overflow-hidden z-[100] max-h-64 overflow-y-auto custom-scrollbar"
+                                >
+                                    {[
+                                        { code: 'en', label: 'English' },
+                                        { code: 'hi', label: 'हिंदी' },
+                                        { code: 'mr', label: 'मराठी' },
+                                        { code: 'gu', label: 'ગુજરાતી' },
+                                        { code: 'ta', label: 'தமிழ்' },
+                                        { code: 'te', label: 'తెలుగు' },
+                                        { code: 'bn', label: 'বাংলা' },
+                                        { code: 'ur', label: 'اردو' }
+                                    ].map(lang => (
+                                        <button 
+                                            key={lang.code}
+                                            onClick={() => {
+                                                handleLanguageChange(lang.code);
+                                                setLangMenuOpen(false);
+                                            }}
+                                            className={`w-full text-left px-4 py-3 text-[11px] font-mono font-bold uppercase transition-colors tracking-wider flex items-center justify-between shrink-0 ${language === lang.code ? 'bg-saffron-500/10 text-saffron-500 border-l-2 border-saffron-500 pl-3.5' : 'text-stone-300 hover:bg-navy-800 hover:text-white'}`}
+                                        >
+                                            {lang.label}
+                                            {language === lang.code && <div className="w-1.5 h-1.5 bg-saffron-500 rounded-full" />}
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     <div id="auth-controls" className="flex items-center gap-2 relative z-[10000] pointer-events-auto">
@@ -137,7 +215,7 @@ const Navbar = ({ onOpenLogin }) => {
                                 onClick={onOpenLogin} 
                                 className="relative z-[10001] bg-saffron-500 text-navy-900 px-6 py-2.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-[0.2em] hover:bg-saffron-400 hover:scale-[1.05] active:scale-95 transition-all shadow-2xl shadow-saffron-500/20 cursor-pointer pointer-events-auto whitespace-nowrap"
                             >
-                                {translations.login[language]}
+                                Login
                             </button>
                         ) : (
                             <div className="flex items-center gap-3 bg-navy-900/50 pl-4 py-1.5 pr-1.5 rounded-xl border border-navy-700">
@@ -167,7 +245,7 @@ const Navbar = ({ onOpenLogin }) => {
                 <div className="mobile-menu fixed top-16 right-0 bottom-0 w-72 bg-navy-800 z-40 p-6 flex flex-col gap-1 lg:hidden border-l border-navy-700 shadow-2xl transition-transform active">
                     {NavItems.map(item => (
                         <a key={item.id} href={`#${item.id}`} onClick={() => setMobileOpen(false)} className="px-4 py-3 text-sm font-mono text-stone-200 hover:bg-navy-700 rounded transition-colors uppercase tracking-wider">
-                            {getTranslation(item)}
+                            {item.label}
                         </a>
                     ))}
                     <a href="#archive" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-sm font-mono text-stone-200 hover:bg-navy-700 rounded transition-colors uppercase tracking-wider">Archive</a>

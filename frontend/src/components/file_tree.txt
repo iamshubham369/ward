@@ -1,0 +1,24 @@
+C:\Users\singh\.gemini\antigravity\scratch\wardfixed\frontend\src\components
+├── Chatbot
+|  └── WardAI.jsx
+├── Layout
+|  └── Navbar.jsx
+├── Modals
+|  ├── LoginModal.jsx
+|  ├── ProjectGenesisModal.jsx
+|  └── ProjectModal.jsx
+└── Sections
+   ├── AccuracyEngine.jsx
+   ├── AdminPortal.jsx
+   ├── Hero.jsx
+   ├── OngoingProjects.jsx
+   ├── Profile.jsx
+   ├── ProjectDetails.jsx
+   ├── ReportIssue.jsx
+   ├── TacticalMap.jsx
+   ├── TransparencyArchive.jsx
+   ├── WardBuzz.jsx
+   └── WardHub.jsx
+
+directory: 4 file: 16
+

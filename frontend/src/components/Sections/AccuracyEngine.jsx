@@ -7,13 +7,7 @@ import { TrendingDown, TrendingUp, Info, Activity, Database, ShieldAlert, Cpu } 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 const AccuracyEngine = () => {
-    const { language } = useContext(AppContext);
-
-    const getT = (en, hi, mr) => {
-        if (language === 'hi') return hi;
-        if (language === 'mr') return mr;
-        return en;
-    };
+    const {} = useContext(AppContext);
 
     const lineData = {
         labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Jan', 'Feb', 'Mar'],

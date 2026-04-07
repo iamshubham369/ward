@@ -13,5 +13,31 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Google Translate API for Single-Click Full App Translation (Hidden in Background) -->
+    <div id="google_translate_element" style="position: absolute; left: -9999px; z-index: -100; opacity: 0;"></div>
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+          pageLanguage: 'en',
+          includedLanguages: 'en,hi,mr,gu,ta,te,bn,ur',
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+          autoDisplay: false
+        }, 'google_translate_element');
+      }
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <style>
+      /* Completely Hide All Google Translate UI Assets */
+      iframe.goog-te-banner-frame,
+      .goog-te-banner-frame { display: none !important; visibility: hidden !important; } 
+      .goog-te-gadget-icon, .goog-te-gadget-simple { display: none !important; }
+      body { top: 0px !important; }
+      html { height: 100% !important; margin-top: 0px !important; }
+      #goog-gt-tt, .goog-te-balloon-frame { display: none !important; }
+      .goog-text-highlight { background: none !important; box-shadow: none !important; }
+      #google_translate_element { opacity: 0; position: absolute; z-index: -99999; height: 0; overflow: hidden; pointer-events: none; }
+    </style>
   </body>
 </html>
