@@ -3,7 +3,7 @@ import { AppContext } from '../../context/AppContext';
 import { MessageSquare, Send, X, Bot, User, Zap, MessageCircleCode, ChevronRight, Activity, Database, AlertCircle } from 'lucide-react';
 
 const WardAI = () => {
-    const { user, issues, projects } = useContext(AppContext);
+    const { language, user, issues, projects } = useContext(AppContext);
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
@@ -15,10 +15,20 @@ const WardAI = () => {
     }, [messages]);
 
     const botResponses = {
-        'greetings': "Namaste! I am WardAI, your digital liaison. How can I assist you with Ward 14 services today?",
-        'water': "Current water disruption in Sectors 5-8 until Jul 12. Normal supply resumes Jul 13.",
-        'default': "I'm not sure about that. Try asking about 'water supply', 'road work', or 'projects'."
+        'greetings': { en: "Namaste! I am WardAI, your digital liaison. How can I assist you with Ward 14 services today?", hi: "नमस्ते! मैं WardAI हूं, आपका डिजिटल सहायक। वार्ड 14 सेवाओं में मैं आपकी कैसे सहायता कर सकता हूँ?", mr: "नमस्कार! मी WardAI आहे, आपला डिजिटल सहाय्यक. मी तुमची कशी मदत करू शकतो?" },
+        'water': { en: "Current water disruption in Sectors 5-8 until Jul 12. Normal supply resumes Jul 13.", hi: "सेक्टर 5-8 में 12 जुलाई तक जल आपूर्ति बाधित। 13 जुलाई से सामान्य आपूर्ति फिर से शुरू।", mr: "सेक्टर ५-८ मध्ये १२ जुलैपर्यंत पाणीपुरवठा खंडित. १३ जुलैपासून सुरळीत पाणीपुरवठा." },
+        'default': { en: "I'm not sure about that. Try asking about 'water supply', 'road work', or 'projects'.", hi: "मुझे उस बारे में यकीन नहीं है। 'जल आपूर्ति', 'सड़क निर्माण' या 'परियोजनाओं' के बारे में पूछने का प्रयास करें।", mr: "मला त्याबद्दल नक्की माहिती नाही. 'पाणीपुरवठा', 'रस्ते काम' किंवा 'प्रकल्पांबद्दल' विचारून पहा." }
     };
+
+    const translations = {
+        title: { en: "WardAI", hi: "वार्डAI", mr: "प्रभागAI" },
+        status: { en: "Strategic Core Online", hi: "रणनीतिक कोर ऑनलाइन", mr: "टेलीमेट्री सक्रिय" },
+        placeholder: { en: "Query Strategic Core...", hi: "रणनीतिक कोर से पूछें...", mr: "विचारपूस करा..." },
+        q1: { en: "Water Analytics", hi: "जल विश्लेषण", mr: "पाणी विश्लेषण" },
+        q2: { en: "Project Records", hi: "प्रोजेक्ट रिकॉर्ड", mr: "प्रकल्प नोंदी" },
+        q3: { en: "Risk Alerts", hi: "जोखिम अलर्ट", mr: "धोका सूचना" }
+    };
+    const t = (key) => translations[key]?.[language || 'en'] || translations[key]['en'];
 
     const handleSend = async (e) => {
         e.preventDefault();
@@ -32,13 +42,15 @@ const WardAI = () => {
 
         setTimeout(() => {
             let reply = "";
-            if (text.includes('hi') || text.includes('hello') || text.includes('namaste')) reply = botResponses.greetings;
-            else if (text.includes('water')) reply = botResponses.water;
-            else if (text.includes('project')) {
-                reply = `There are currently ${projects.length} active infrastructure projects in your ward.`;
-            } else if (text.includes('issue')) {
-                reply = `There are ${issues.length} reported civic issues currently being monitored.`;
-            } else reply = botResponses.default;
+            const lang = language || 'en';
+
+            if (text.includes('hi') || text.includes('hello') || text.includes('namaste')) reply = botResponses.greetings[lang];
+            else if (text.includes('water') || text.includes('পানি')) reply = botResponses.water[lang];
+            else if (text.includes('project') || text.includes('परियोजना')) {
+                reply = lang === 'en' ? `There are currently ${projects.length} active infrastructure projects in your ward.` : `आपके वार्ड में वर्तमान में ${projects.length} सक्रिय परियोजनाएं हैं।`;
+            } else if (text.includes('issue') || text.includes('तक्रार')) {
+                reply = lang === 'en' ? `There are ${issues.length} reported civic issues currently being monitored.` : `वर्तमान में ${issues.length} मुद्दों की निगरानी की जा रही है।`;
+            } else reply = botResponses.default[lang];
 
             setMessages([...newMessages, { text: reply, side: 'bot' }]);
             setIsThinking(false);
@@ -48,11 +60,14 @@ const WardAI = () => {
     const toggle = () => {
         setIsOpen(!isOpen);
         if (!isOpen && messages.length === 0) {
-            let greeting = `Namaste Neighbor! How can I assist you with Ward 14 telemetry today?`;
+            const lang = language || 'en';
+            const greetAdmin = { en: `Welcome back, Commissioner. Telemetry synced.`, hi: `वापसी पर स्वागत है, कमिश्नर। टेलीमेट्री सिंक हो गई।`, mr: `पुन्हा स्वागत आहे, कमिशनर. टेलिमेट्री सिंक झाली.` };
+            const greetUser = { en: `Hello ${user?.name?.split(' ')[0]}! Ready to explore Ward 14?`, hi: `नमस्ते ${user?.name?.split(' ')[0]}! वार्ड 14 की खोज के लिए तैयार हैं?`, mr: `नमस्कार ${user?.name?.split(' ')[0]}! प्रभाग १४ एक्सप्लोर करण्यासाठी तयार आहात?` };
+            const greetGuest = { en: `Namaste Neighbor! How can I assist you with Ward 14 telemetry today?`, hi: `नमस्ते पड़ोसी! आज मैं वार्ड 14 टेलीमेट्री में आपकी कैसे सहायता कर सकता हूं?`, mr: `नमस्कार शेजारी! आज मी प्रभाग १४ च्या संदर्भात आपली कशी मदत करू शकतो?` };
+            
+            let greeting = greetGuest[lang];
             if (user) {
-                greeting = user.role === 'Authority' 
-                    ? `Welcome back, Commissioner. Telemetry synced.` 
-                    : `Hello ${user?.name?.split(' ')[0]}! Ready to explore Ward 14?`;
+                greeting = user.role === 'Authority' ? greetAdmin[lang] : greetUser[lang];
             }
             setMessages([{ text: greeting, side: 'bot' }]);
         }
@@ -70,7 +85,7 @@ const WardAI = () => {
                             <h3 className="font-display font-black text-xl sm:text-2xl text-stone-50 leading-tight uppercase tracking-tight">Ward<span className="text-saffron-500 italic">AI</span></h3>
                             <div className="flex items-center gap-2 mt-1.5 px-2 sm:px-3 py-1 bg-navy-800/80 rounded-xl border border-navy-700 shadow-sm">
                                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-lg shadow-emerald-500/50"></div>
-                                <span className="text-[9px] sm:text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-black">Strategic Core Online</span>
+                                <span className="text-[9px] sm:text-[10px] font-mono text-emerald-400 uppercase tracking-widest font-black">{t('status')}</span>
                             </div>
                         </div>
                     </div>
@@ -94,16 +109,16 @@ const WardAI = () => {
 
                 {isOpen && messages.length < 3 && (
                     <div className="px-4 sm:px-8 flex flex-wrap gap-2 mb-4 sm:mb-6">
-                         <QuickQuery text="Water Analytics" icon={<Activity className="w-3 h-3"/>} onClick={() => setInput('Water supply')} />
-                         <QuickQuery text="Project Records" icon={<Database className="w-3 h-3"/>} onClick={() => setInput('Active projects')} />
-                         <QuickQuery text="Risk Alerts" icon={<AlertCircle className="w-3 h-3"/>} onClick={() => setInput('Current issues')} />
+                         <QuickQuery text={t('q1')} icon={<Activity className="w-3 h-3"/>} onClick={() => setInput('Water supply')} />
+                         <QuickQuery text={t('q2')} icon={<Database className="w-3 h-3"/>} onClick={() => setInput('Active projects')} />
+                         <QuickQuery text={t('q3')} icon={<AlertCircle className="w-3 h-3"/>} onClick={() => setInput('Current issues')} />
                     </div>
                 )}
 
                 <form onSubmit={handleSend} className="p-4 sm:p-8 border-t border-stone-100 dark:border-navy-800 bg-white dark:bg-navy-900">
                     <div className="flex items-center gap-2 sm:gap-4 bg-stone-100 dark:bg-navy-950 p-2 sm:p-2.5 rounded-full sm:rounded-[2rem] border border-stone-200 dark:border-navy-800 focus-within:border-saffron-500 focus-within:ring-4 focus-within:ring-saffron-500/5 transition-all group overflow-hidden">
                         <MessageSquare className="hidden sm:block w-5 h-5 text-stone-400 group-focus-within:text-saffron-500 ml-4" />
-                        <input type="text" value={input} onChange={e => setInput(e.target.value)} placeholder="Query Strategic Core..." className="flex-1 bg-transparent border-none outline-none text-xs font-mono font-bold dark:text-stone-100 placeholder:text-stone-500 px-3 sm:px-0" />
+                        <input type="text" value={input} onChange={e => setInput(e.target.value)} placeholder={t('placeholder')} className="flex-1 bg-transparent border-none outline-none text-xs font-mono font-bold dark:text-stone-100 placeholder:text-stone-500 px-3 sm:px-0" />
                         <button type="submit" className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-navy-900 dark:bg-saffron-500 rounded-full sm:rounded-2xl flex items-center justify-center text-stone-50 dark:text-navy-900 hover:scale-110 active:scale-95 transition-all shadow-xl group/send"><Send className="w-4 h-4 sm:w-5 sm:h-5 group-send:rotate-[-45deg] transition-transform" /></button>
                     </div>
                 </form>

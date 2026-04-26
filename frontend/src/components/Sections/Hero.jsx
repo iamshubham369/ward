@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef } from 'react';
 import { AppContext } from '../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 import { UserCheck, Users, Clock, ShieldCheck, ChevronDown } from 'lucide-react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
@@ -8,12 +9,13 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Hero = () => {
     const { issues, projects } = useContext(AppContext);
+    const { t } = useTranslation();
 
     const stats = [
-        { label: 'Issues Reported', target: issues?.length || 847, color: 'text-stone-50' },
-        { label: 'Issues Resolved', target: 612, color: 'text-emerald-400' },
-        { label: 'Active Projects', target: projects?.length || 5, color: 'text-saffron-400' },
-        { label: 'Accuracy Score', target: 72, color: 'text-stone-50', suffix: '%' }
+        { label: t('hero.issues_reported'), target: issues?.length || 847, color: 'text-stone-50' },
+        { label: t('hero.resolved_issues'), target: 612, color: 'text-emerald-400' },
+        { label: t('hero.active_projects'), target: projects?.length || 5, color: 'text-saffron-400' },
+        { label: t('hero.accuracy_score'), target: 72, color: 'text-stone-50', suffix: '%' }
     ];
 
     const gaugeData = {
@@ -41,22 +43,22 @@ const Hero = () => {
             
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 w-full flex flex-col items-center lg:items-start">
                 <div className="mb-6 text-center lg:text-left">
-                    <span className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-400 font-semibold border border-saffron-500/30 px-3 py-1 rounded-full">Nagpur Municipal Corporation</span>
+                    <span className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-400 font-semibold border border-saffron-500/30 px-3 py-1 rounded-full">{t('hero.nmc')}</span>
                 </div>
 
                 <div className="grid lg:grid-cols-5 gap-12 items-center w-full">
                     <div className="lg:col-span-3 text-center lg:text-left">
                         <h1 className="font-display font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-stone-50 leading-[0.95] tracking-tight mb-4">
-                            <span>Ward <span className="text-saffron-400">14</span></span>
+                            <span>{t('hero.ward_14')}</span>
                         </h1>
                         <p className="font-display text-xl sm:text-2xl text-stone-300/80 mb-6 italic">
                             Dharampeth, Nagpur
                         </p>
 
                         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-stone-400 mb-8 justify-center lg:justify-start">
-                            <span className="flex items-center gap-2"><UserCheck className="w-4 h-4 text-saffron-500/60" /> Councillor: Smt. Priya Deshmukh</span>
-                            <span className="flex items-center gap-2"><Users className="w-4 h-4 text-saffron-500/60" /> Population: ~48,200</span>
-                            <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-saffron-500/60" /> Last sync: 3 min ago</span>
+                            <span className="flex items-center gap-2"><UserCheck className="w-4 h-4 text-saffron-500/60" /> {t('hero.councillor')}: Smt. Priya Deshmukh</span>
+                            <span className="flex items-center gap-2"><Users className="w-4 h-4 text-saffron-500/60" /> {t('hero.population')}: ~48,200</span>
+                            <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-saffron-500/60" /> {t('hero.last_sync')}</span>
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -75,26 +77,26 @@ const Hero = () => {
 
                     <div className="lg:col-span-2 flex flex-col items-center">
                         <div className="text-[10px] font-mono text-stone-400 uppercase tracking-[0.25em] mb-3 mt-12 lg:mt-0">
-                            Ward Health Score
+                            {t('hero.ward_health')}
                         </div>
                         <div className="relative gauge-glow scale-90 sm:scale-100 w-64 h-40">
                             <Doughnut data={gaugeData} options={gaugeOptions} />
                             <div className="absolute inset-0 flex flex-col items-center justify-center pt-8">
                                 <span className="font-mono text-4xl font-black text-stone-50 leading-none">72<span className="text-xl text-saffron-400 font-bold ml-0.5">%</span></span>
-                                <span className="text-[10px] font-mono font-bold text-saffron-500 uppercase tracking-widest mt-1">Stellar</span>
+                                <span className="text-[10px] font-mono font-bold text-saffron-500 uppercase tracking-widest mt-1">{t('hero.stellar')}</span>
                             </div>
                         </div>
                         <div className="grid grid-cols-3 gap-4 mt-8 w-full max-w-xs">
-                            <div className="text-center"><div className="font-mono text-sm font-semibold text-stone-200">72%</div><div className="text-[9px] font-mono text-stone-500 uppercase">Resolution</div></div>
-                            <div className="text-center"><div className="font-mono text-sm font-semibold text-stone-200">58%</div><div className="text-[9px] font-mono text-stone-500 uppercase">On-Time</div></div>
-                            <div className="text-center"><div className="font-mono text-sm font-semibold text-stone-200">71%</div><div className="text-[9px] font-mono text-stone-500 uppercase">Satisfaction</div></div>
+                            <div className="text-center"><div className="font-mono text-sm font-semibold text-stone-200">72%</div><div className="text-[9px] font-mono text-stone-500 uppercase">{t('hero.resolution')}</div></div>
+                            <div className="text-center"><div className="font-mono text-sm font-semibold text-stone-200">58%</div><div className="text-[9px] font-mono text-stone-500 uppercase">{t('hero.on_time')}</div></div>
+                            <div className="text-center"><div className="font-mono text-sm font-semibold text-stone-200">71%</div><div className="text-[9px] font-mono text-stone-500 uppercase">{t('hero.satisfaction')}</div></div>
                         </div>
                     </div>
                 </div>
 
                 <div className="mt-10 flex justify-center w-full lg:justify-start">
                     <a href="#buzz" className="inline-flex items-center gap-2 text-stone-400 hover:text-saffron-400 transition-colors text-xs font-mono uppercase tracking-widest group">
-                        <span>Scroll to explore</span>
+                        <span>{t('hero.scroll')}</span>
                         <ChevronDown className="w-4 h-4 animate-bounce group-hover:translate-y-1 transition-transform" />
                     </a>
                 </div>

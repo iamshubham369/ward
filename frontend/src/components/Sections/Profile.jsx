@@ -1,10 +1,12 @@
 import React, { useContext, useMemo } from 'react';
 import { AppContext } from '../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 import { User, Shield, Calendar, Activity, MapPin, CheckCircle2, Clock, ChevronRight, LogOut, Key, ArrowLeft, Award, TrendingUp, Fingerprint } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Profile = ({ onBack }) => {
     const { user, issues, logout, language } = useContext(AppContext);
+    const { t } = useTranslation();
 
     // Calculate Strategic Stats
     const myIssues = useMemo(() => {
@@ -14,10 +16,10 @@ const Profile = ({ onBack }) => {
     }, [issues, user]);
 
     const stats = useMemo(() => [
-        { label: 'Strategic Reports', value: myIssues.length, icon: Activity, color: 'text-saffron-500' },
-        { label: 'Community Upvotes', value: '142', icon: TrendingUp, color: 'text-emerald-500' },
-        { label: 'Protocol Resolved', value: '88%', icon: CheckCircle2, color: 'text-blue-500' },
-    ], [myIssues]);
+        { label: t('profile.reports'), value: myIssues.length, icon: Activity, color: 'text-saffron-500' },
+        { label: t('profile.upvotes'), value: '142', icon: TrendingUp, color: 'text-emerald-500' },
+        { label: t('profile.resolved_rate'), value: '88%', icon: CheckCircle2, color: 'text-blue-500' },
+    ], [myIssues, t]);
 
     if (!user) return null;
 
@@ -28,7 +30,7 @@ const Profile = ({ onBack }) => {
             <div className="max-w-5xl mx-auto">
                 <button onClick={onBack} className="flex items-center gap-2 text-stone-400 hover:text-saffron-500 transition-colors mb-10 group">
                     <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                    <span className="text-[10px] font-mono font-black uppercase tracking-[0.3em]">Return to Map Matrix</span>
+                    <span className="text-[10px] font-mono font-black uppercase tracking-[0.3em]">{t('profile.return')}</span>
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -50,16 +52,16 @@ const Profile = ({ onBack }) => {
                                 <h2 className="text-2xl font-display font-black text-white uppercase tracking-tight mb-2">{user.name}</h2>
                                 <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-saffron-500/10 border border-saffron-500/30 rounded-full mb-6">
                                     <Shield className="w-3.5 h-3.5 text-saffron-500" />
-                                    <span className="text-[10px] font-mono font-black text-saffron-500 uppercase tracking-widest">{user.role} Identity</span>
+                                    <span className="text-[10px] font-mono font-black text-saffron-500 uppercase tracking-widest">{user.role} {t('profile.identity')}</span>
                                 </div>
                                 <p className="text-stone-400 text-xs font-medium mb-8 break-all">{user.email}</p>
                                 <div className="pt-8 border-t border-white/5 flex flex-col gap-4">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[9px] font-mono text-stone-500 uppercase tracking-widest">Enrolled Since</span>
+                                        <span className="text-[9px] font-mono text-stone-500 uppercase tracking-widest">{t('profile.enrolled')}</span>
                                         <span className="text-[10px] font-mono font-black text-white uppercase tracking-widest">APR 07, 2026</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span className="text-[9px] font-mono text-stone-500 uppercase tracking-widest">Node Location</span>
+                                        <span className="text-[9px] font-mono text-stone-500 uppercase tracking-widest">{t('profile.location')}</span>
                                         <span className="text-[10px] font-mono font-black text-white uppercase tracking-widest">Ward 14 Matrix</span>
                                     </div>
                                 </div>
@@ -79,7 +81,7 @@ const Profile = ({ onBack }) => {
                                         <div className="w-10 h-10 rounded-xl bg-saffron-100 dark:bg-saffron-500/10 flex items-center justify-center">
                                             <Key className="w-5 h-5 text-saffron-600 dark:text-saffron-500" />
                                         </div>
-                                        <span className="text-xs font-black uppercase tracking-widest dark:text-stone-100">Modify Security Key</span>
+                                        <span className="text-xs font-black uppercase tracking-widest dark:text-stone-100">{t('profile.modify_key')}</span>
                                     </div>
                                     <ChevronRight className="w-5 h-5 text-stone-300 group-hover:text-saffron-500 transition-colors" />
                                 </button>
@@ -88,7 +90,7 @@ const Profile = ({ onBack }) => {
                                         <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
                                             <LogOut className="w-5 h-5 text-red-600" />
                                         </div>
-                                        <span className="text-xs font-black uppercase tracking-widest text-red-600">Terminate Protocol Session</span>
+                                        <span className="text-xs font-black uppercase tracking-widest text-red-600">{t('profile.terminate')}</span>
                                     </div>
                                 </button>
                             </div>
@@ -123,11 +125,11 @@ const Profile = ({ onBack }) => {
                         >
                             <div className="flex items-center justify-between mb-10">
                                 <h4 className="text-[11px] font-mono font-black text-navy-900 dark:text-stone-100 uppercase tracking-[0.4em] flex items-center gap-3">
-                                    <Activity className="w-5 h-5 text-saffron-500" /> Active Service Record
+                                    <Activity className="w-5 h-5 text-saffron-500" /> {t('profile.record')}
                                 </h4>
                                 <div className="px-5 py-2 bg-stone-100 dark:bg-navy-900 rounded-full border border-stone-200 dark:border-navy-700 flex items-center gap-3">
                                     <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                                    <span className="text-[9px] font-mono font-black text-stone-500 uppercase tracking-widest">Real-time Node Status</span>
+                                    <span className="text-[9px] font-mono font-black text-stone-500 uppercase tracking-widest">{t('profile.node_status')}</span>
                                 </div>
                             </div>
 
@@ -140,24 +142,24 @@ const Profile = ({ onBack }) => {
                                                 <p className="text-[10px] font-mono font-black text-stone-400 uppercase tracking-widest mb-2 flex items-center gap-3">
                                                     {issue.timestamp?.split('T')[0] || '2024-04-07'} <ArrowLeft className="w-3 h-3 rotate-180 text-saffron-500" /> #{issue.id}
                                                 </p>
-                                                <h6 className="text-md font-black text-navy-900 dark:text-stone-100 uppercase tracking-tight mb-2">{issue.category}</h6>
+                                                <h6 className="text-md font-black text-navy-900 dark:text-stone-100 uppercase tracking-tight mb-2">{t(`cat.${(issue.category || '').toLowerCase().replace(' ', '_')}`)}</h6>
                                                 <p className="text-xs text-stone-500 line-clamp-2">{issue.description}</p>
                                             </div>
                                             <div className={`shrink-0 px-4 py-1.5 rounded-full border text-[9px] font-mono font-black uppercase tracking-widest ${issue.status === 'Resolved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20' : 'bg-saffron-50 text-saffron-600 border-saffron-100 dark:bg-saffron-500/10 dark:border-saffron-500/20'}`}>
-                                                {issue.status}
+                                                {t(`status.${(issue.status || '').toLowerCase().replace(' ', '_')}`)}
                                             </div>
                                         </div>
                                     </div>
                                 )) : (
                                     <div className="text-center py-12">
                                         <Award className="w-16 h-16 text-stone-200 dark:text-navy-700 mx-auto mb-6" />
-                                        <p className="text-xs font-mono font-black text-stone-400 uppercase tracking-widest">No Strategic Activity Recorded Yet</p>
+                                        <p className="text-xs font-mono font-black text-stone-400 uppercase tracking-widest">{t('profile.no_activity')}</p>
                                     </div>
                                 )}
                             </div>
 
                             <button className="w-full mt-12 py-5 bg-navy-900 dark:bg-navy-950 text-white rounded-2xl text-[10px] font-mono font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 hover:bg-black transition-all">
-                                Download Full Civic Identity Dossier (PDF) <ChevronRight className="w-4 h-4" />
+                                {t('profile.download')} <ChevronRight className="w-4 h-4" />
                             </button>
                         </motion.div>
                     </div>

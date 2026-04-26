@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AppProvider, AppContext } from './context/AppContext';
 import Navbar from './components/Layout/Navbar';
 import Hero from './components/Sections/Hero';
@@ -21,9 +22,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const AppContent = () => {
     const { toast, user, darkMode, language, issues, projects, selectedProjectId, view, setView } = useContext(AppContext);
+    const { t, i18n } = useTranslation();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isProjectOpen, setIsProjectOpen] = useState(false);
     const [isGenesisOpen, setIsGenesisOpen] = useState(false);
+
+    useEffect(() => {
+        i18n.changeLanguage(language);
+    }, [language, i18n]);
 
     const handleOpenGenesis = () => {
         console.log("CRITICAL: Genesis Protocol Initiated");
@@ -61,7 +67,7 @@ const AppContent = () => {
                             <div className="flex items-center gap-4 min-w-0">
                                 <div className="p-2 bg-navy-900 rounded-xl shadow-lg animate-pulse"><Bell className="w-4 h-4 text-saffron-400" /></div>
                                 <p className="text-xs font-black uppercase tracking-wider truncate italic">
-                                    Flash Flood Warning: Evacuate low-lying areas in Sector 7 immediately. Emergency Response Teams activated.
+                                    {t('app.alert')}
                                 </p>
                             </div>
                             <button onClick={() => setIsEmergencyVisible(false)} className="shrink-0 p-2 hover:bg-navy-900/10 rounded-xl transition-all border border-transparent hover:border-navy-900/20"><X className="w-4 h-4" /></button>
@@ -140,7 +146,7 @@ const AppContent = () => {
                             {toast.type === 'success' ? <CheckCircle className="text-emerald-500 w-5 h-5 shadow-sm" /> : toast.type === 'error' ? <AlertCircle className="text-red-500 w-5 h-5 shadow-sm" /> : <Info className="text-saffron-500 w-5 h-5 shadow-sm" />}
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-mono font-black text-saffron-500 uppercase tracking-widest leading-none mb-1">System Advisory</span>
+                            <span className="text-[10px] font-mono font-black text-saffron-500 uppercase tracking-widest leading-none mb-1">{t('app.advisory')}</span>
                             <span className="text-xs font-bold tracking-tight text-stone-200">{toast.message}</span>
                         </div>
                     </motion.div>
@@ -158,13 +164,13 @@ const AppContent = () => {
                         </div>
                     </div>
                     <div className="flex justify-center gap-8 mb-10">
-                        {['Protocol', 'Analytics', 'Transparency', 'Archive'].map(item => (
-                            <a key={item} href={`#${item.toLowerCase()}`} className="text-[10px] font-mono font-black text-stone-500 hover:text-saffron-500 transition-colors uppercase tracking-[0.3em]">{item}</a>
+                        {['protocol', 'analytics', 'transparency', 'archive'].map(item => (
+                            <a key={item} href={`#${item.toLowerCase()}`} className="text-[10px] font-mono font-black text-stone-500 hover:text-saffron-500 transition-colors uppercase tracking-[0.3em]">{t(`app.${item}`)}</a>
                         ))}
                     </div>
                     <p className="text-[9px] font-mono text-stone-600 uppercase tracking-widest leading-relaxed">
-                        &copy; 2026 Nagpur Municipal Corporation — Strategic Ward Digital Infrastructure.<br/>
-                        <span className="opacity-40 italic">Unauthorized access to tactical core is strictly monitored by Ward Security protocols.</span>
+                        {t('app.copyright')}<br/>
+                        <span className="opacity-40 italic">{t('app.unauthorized')}</span>
                     </p>
                 </div>
             </footer>

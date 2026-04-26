@@ -1,30 +1,98 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { AppContext } from '../../context/AppContext';
-import { Plus, Calendar, IndianRupee, HardHat, TrendingUp, AlertTriangle, CheckCircle2, ChevronRight, BarChart3, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { HardHat, IndianRupee, Calendar, ArrowRight, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-const OngoingProjects = ({ onOpenModal }) => {
-    const { projects, user, setView, setSelectedProjectId } = useContext(AppContext);
+const OngoingProjects = () => {
+    const { t } = useTranslation();
+    const { projects, language, setView, setSelectedProjectId } = useContext(AppContext);
+
+    const getTranslation = (proj) => {
+        if (language === 'hi' && proj.name_hi) return proj.name_hi;
+        if (language === 'mr' && proj.name_mr) return proj.name_mr;
+        return proj.name_en;
+    };
+
+    const getDeptTranslation = (proj) => {
+        if (language === 'hi' && proj.dept_hi) return proj.dept_hi;
+        if (language === 'mr' && proj.dept_mr) return proj.dept_mr;
+        return proj.dept_en;
+    };
 
     return (
-        <section id="projects" className="bg-stone-100 dark:bg-navy-950 py-16 md:py-24 border-b border-stone-200 dark:border-navy-800">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6">
-                <div className="reveal visible">
-                    <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-600 font-black mb-3 block italic tracking-[0.4em]">Strategic Deployment</span>
-                    <div className="flex flex-wrap items-end justify-between gap-6 mb-12">
-                        <div>
-                            <h2 className="font-display font-black text-4xl sm:text-5xl md:text-6xl text-navy-900 dark:text-stone-50 leading-tight tracking-tight uppercase group">
-                                Ongoing <span className="text-saffron-500 italic">Projects</span>
-                            </h2>
-                            <p className="text-stone-500 font-bold dark:text-stone-400 mt-4 max-w-xl text-xs font-mono uppercase tracking-widest leading-loose">
-                                Every rupee tracked. Every deadline watched. Real-time project intelligence for Dharampeth Sector.
-                            </p>
-                        </div>
+        <section id="projects" className="py-32 bg-stone-50 dark:bg-navy-950 relative overflow-hidden transition-colors duration-500">
+            {/* Ambient Background */}
+            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-saffron-500/5 to-transparent pointer-events-none"></div>
+            
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+                <div className="mb-20">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="h-[2px] w-12 bg-saffron-500"></div>
+                        <span className="text-[10px] font-mono font-black text-saffron-600 dark:text-saffron-500 uppercase tracking-[0.4em]">{t('projects.strategic')}</span>
                     </div>
+                    <h2 className="text-6xl sm:text-7xl font-display font-black text-navy-900 dark:text-stone-50 mb-8 tracking-tighter italic uppercase underline decoration-saffron-500/30 decoration-8 underline-offset-8">
+                        {t('projects.ongoing')}<br />
+                        <span className="text-saffron-500">{t('projects.projects')}</span>
+                    </h2>
+                    <p className="max-w-2xl text-lg text-stone-500 dark:text-stone-400 font-medium leading-relaxed">
+                        {t('projects.desc')}
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 reveal visible">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {projects.map((project, idx) => (
-                        <ProjectCard key={project.id} project={project} name={project.name_en} />
+                        <motion.div 
+                            key={project.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            onClick={() => {
+                                setSelectedProjectId(project.id);
+                                setView('project-details');
+                            }}
+                            className="group bg-white dark:bg-navy-900 rounded-[2.5rem] p-10 border border-stone-200 dark:border-navy-800 hover:border-saffron-500/50 transition-all duration-500 shadow-xl hover:shadow-2xl cursor-pointer relative overflow-hidden"
+                        >
+                            <div className="relative z-10">
+                                <div className="flex justify-between items-start mb-10">
+                                    <div className="bg-navy-900 dark:bg-navy-800 p-4 rounded-2xl group-hover:scale-110 transition-transform duration-500">
+                                        <HardHat className="text-saffron-500 w-6 h-6" />
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-[9px] font-mono font-black text-stone-400 uppercase tracking-widest mb-1 italic opacity-60">Status</span>
+                                        <span className={`text-[10px] font-mono font-black uppercase tracking-widest ${project.status === 'Delayed' ? 'text-red-500' : 'text-emerald-500'}`}>
+                                            {t(`status.${(project.status || '').toLowerCase().replace('-', '_')}`)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <h3 className="text-2xl font-display font-black text-navy-900 dark:text-stone-50 mb-4 group-hover:text-saffron-500 transition-colors uppercase leading-tight tracking-tight">
+                                    {getTranslation(project)}
+                                </h3>
+                                <p className="text-xs font-mono text-stone-500 dark:text-stone-400 font-bold uppercase tracking-widest mb-8 flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 bg-saffron-500 rounded-full"></span> {getDeptTranslation(project)}
+                                </p>
+
+                                <div className="space-y-4 pt-6 border-t border-stone-100 dark:border-navy-800">
+                                    <ProjectStat icon={<IndianRupee className="w-3 h-3" />} label={t('projects.allocation')} value={`₹ ${project.budget} ${t('common.lakh')}`} />
+                                    <ProjectStat icon={<Clock className="w-3 h-3" />} label={t('projects.deadline')} value={new Date(project.deadline).toLocaleDateString(language === 'hi' ? 'hi-IN' : language === 'mr' ? 'mr-IN' : 'en-IN', { day:'numeric', month:'short' })} />
+                                </div>
+
+                                <div className="mt-8">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="text-[10px] font-mono font-black text-stone-500 dark:text-stone-400 uppercase tracking-widest">{t('projects.phase')}</span>
+                                        <span className="text-xs font-mono font-black text-navy-900 dark:text-saffron-400">{project.progress}%</span>
+                                    </div>
+                                    <div className="h-2 bg-stone-100 dark:bg-navy-800 rounded-full overflow-hidden">
+                                        <motion.div 
+                                            initial={{ width: 0 }}
+                                            whileInView={{ width: `${project.progress}%` }}
+                                            className="h-full bg-saffron-500 shadow-[0_0_15px_rgba(234,179,8,0.4)]"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
                     ))}
                 </div>
             </div>
@@ -32,63 +100,14 @@ const OngoingProjects = ({ onOpenModal }) => {
     );
 };
 
-const ProjectCard = ({ project, name }) => {
-    const { setView, setSelectedProjectId } = useContext(AppContext);
-    const isDelayed = project.status === 'Delayed';
-    const isCompleted = project.progress === 100;
-
-    return (
-        <div className={`bg-white dark:bg-navy-900/80 border p-8 rounded-[2.5rem] shadow-xl hover:shadow-2xl hover:translate-y-[-8px] transition-all duration-700 group relative overflow-hidden flex flex-col h-full backdrop-blur-xl ${isDelayed ? 'border-red-500/20' : 'border-stone-100 dark:border-navy-700 hover:border-saffron-500/30'}`}>
-            <div className="absolute top-0 right-0 w-32 h-32 bg-saffron-500/5 rounded-full -translate-y-16 translate-x-16 blur-2xl group-hover:bg-saffron-500/10 transition-all"></div>
-            
-            <div className="flex items-center justify-between mb-8 relative z-10">
-                <div className="bg-stone-50 dark:bg-navy-800 border border-stone-100 dark:border-navy-700 px-4 py-2 rounded-2xl text-[9px] font-mono font-black text-stone-500 dark:text-saffron-400 uppercase tracking-widest shadow-inner">
-                    {project.category}
-                </div>
-                {isDelayed ? <AlertTriangle className="w-5 h-5 text-red-500 animate-pulse" /> : isCompleted ? <CheckCircle2 className="w-5 h-5 text-emerald-500" /> : <TrendingUp className="w-5 h-5 text-emerald-400" />}
-            </div>
-
-            <h3 className="font-display font-black text-2xl text-navy-900 dark:text-stone-50 mb-3 leading-tight tracking-tight uppercase group-hover:text-saffron-500 transition-colors">{name}</h3>
-            <p className="text-[10px] font-mono text-stone-400 uppercase tracking-widest font-black mb-8 flex items-center gap-2">
-                <HardHat className="w-3.5 h-3.5 text-stone-500" /> {project.contractor || 'Assigned Logistics Agent'}
-            </p>
-
-            <div className="space-y-6 flex-1 mb-10">
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-stone-50 dark:bg-navy-800/50 p-4 rounded-3xl border border-stone-100 dark:border-navy-700 shadow-inner group-hover:bg-stone-100 dark:group-hover:bg-navy-800 transition-all">
-                        <div className="flex items-center gap-2 text-[9px] font-mono text-stone-400 uppercase tracking-widest font-bold mb-1"><IndianRupee className="w-3 h-3 text-emerald-500" /> Allocation</div>
-                        <div className="text-lg font-black text-navy-900 dark:text-stone-100 tracking-tight">{project.budget} <span className="text-[10px] font-mono text-stone-400">LAKH</span></div>
-                    </div>
-                    <div className="bg-stone-50 dark:bg-navy-800/50 p-4 rounded-3xl border border-stone-100 dark:border-navy-700 shadow-inner group-hover:bg-stone-100 dark:group-hover:bg-navy-800 transition-all">
-                        <div className="flex items-center gap-2 text-[9px] font-mono text-stone-400 uppercase tracking-widest font-bold mb-1"><Clock className="w-3 h-3 text-saffron-500" /> Deadline</div>
-                        <div className="text-lg font-black text-navy-900 dark:text-stone-100 tracking-tight">{new Date(project.deadline).toLocaleDateString('en-IN', { day:'numeric', month:'short' })}</div>
-                    </div>
-                </div>
-
-                <div>
-                    <div className="flex items-center justify-between mb-3">
-                        <span className="text-[10px] font-mono font-black text-stone-500 dark:text-stone-400 uppercase tracking-widest px-1">Phase Synchronization</span>
-                        <span className="text-xs font-mono font-black text-navy-900 dark:text-saffron-400 bg-saffron-500/10 px-2 py-0.5 rounded-lg">{project.progress}%</span>
-                    </div>
-                    <div className="h-4 bg-stone-100 dark:bg-navy-800 rounded-full overflow-hidden border border-stone-200 dark:border-navy-700 shadow-inner p-1">
-                        <div className={`h-full rounded-full transition-all duration-1000 ease-out relative ${isDelayed ? 'bg-gradient-to-r from-red-500 to-orange-500 shadow-lg shadow-red-500/40' : 'bg-gradient-to-r from-saffron-500 to-amber-400 shadow-lg shadow-saffron-500/40'}`} style={{ width: `${project.progress}%` }}>
-                            <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button 
-                onClick={() => {
-                    setSelectedProjectId(project.id);
-                    setView('project-details');
-                }}
-                className="w-full py-4 bg-navy-900 dark:bg-navy-800 hover:bg-navy-800 dark:hover:bg-navy-700 text-stone-200 rounded-2xl text-[9px] font-mono font-black uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-3 group/btn shadow-xl active:scale-[0.98]"
-            >
-                Intelligence Details <ChevronRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
-            </button>
+const ProjectStat = ({ icon, label, value }) => (
+    <div className="flex justify-between items-center bg-stone-50/50 dark:bg-navy-950/30 p-3 rounded-xl border border-stone-100 dark:border-navy-800">
+        <div className="flex items-center gap-2">
+            {icon}
+            <span className="text-[9px] font-mono font-black text-stone-400 uppercase tracking-widest">{label}</span>
         </div>
-    );
-};
+        <span className="text-[10px] font-mono font-black text-navy-900 dark:text-stone-100">{value}</span>
+    </div>
+);
 
 export default OngoingProjects;

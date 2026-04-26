@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { AppContext } from '../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 import { TrendingDown, TrendingUp, Info, Activity, Database, ShieldAlert, Cpu } from 'lucide-react';
@@ -7,12 +8,13 @@ import { TrendingDown, TrendingUp, Info, Activity, Database, ShieldAlert, Cpu } 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 const AccuracyEngine = () => {
-    const {} = useContext(AppContext);
+    const { language } = useContext(AppContext);
+    const { t } = useTranslation();
 
     const lineData = {
-        labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Jan', 'Feb', 'Mar'],
+        labels: [t('common.q1'), t('common.q2'), t('common.q3'), t('common.q4'), t('common.jan'), t('common.feb'), t('common.mar')],
         datasets: [{
-            label: 'System Accuracy %',
+            label: t('accuracy.sys_acc'),
             data: [65, 71, 68, 74, 72, 75, 72],
             borderColor: '#E8A317',
             backgroundColor: 'rgba(232, 163, 23, 0.1)',
@@ -27,9 +29,9 @@ const AccuracyEngine = () => {
     };
 
     const barData = {
-        labels: ['Roads', 'Water', 'Electric', 'Sanit', 'Parks'],
+        labels: [t('cat.roads'), t('cat.water'), t('cat.elec'), t('cat.sanit'), t('cat.parks')],
         datasets: [{
-            label: 'Dept Score',
+            label: t('accuracy.dept_score'),
             data: [58, 82, 75, 61, 90],
             backgroundColor: ['#3D5580', '#E8A317', '#2E4068', '#FBD96B', '#1A2640'],
             borderRadius: 12,
@@ -52,16 +54,16 @@ const AccuracyEngine = () => {
             <div className="absolute inset-0 bg-gradient-to-b from-navy-950/80 via-navy-900/50 to-navy-950/90 pointer-events-none"></div>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
                 <div className="reveal visible mb-12">
-                    <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-400 font-black mb-3 block italic tracking-[0.5em]">Data Intelligence Node</span>
+                    <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-400 font-black mb-3 block italic tracking-[0.5em]">{t('accuracy.node')}</span>
                     <h2 className="font-display font-black text-4xl sm:text-5xl md:text-6xl text-stone-50 mt-2 mb-3 tracking-tighter uppercase group">
-                        Accuracy <span className="text-saffron-500 italic">Engine</span>
+                        {t('accuracy.title')} <span className="text-saffron-500 italic">{t('accuracy.engine')}</span>
                     </h2>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12 reveal visible">
                     <div className="bg-navy-800/80 border border-navy-700/50 rounded-3xl p-10 text-center shadow-2xl backdrop-blur-xl group hover:border-saffron-500/30 transition-all duration-700">
                         <div className="text-[10px] font-mono text-stone-500 hover:text-saffron-400 uppercase tracking-[0.4em] mb-6 font-bold flex items-center justify-center gap-3 transition-colors">
-                            Overall Accuracy <Cpu className="w-3.5 h-3.5 animate-pulse" />
+                            {t('accuracy.overall')} <Cpu className="w-3.5 h-3.5 animate-pulse" />
                         </div>
                         <div className="flex items-end justify-center gap-3 group-hover:scale-110 transition-transform duration-500">
                             <span className="font-mono font-black text-7xl sm:text-8xl text-stone-50 tracking-tighter italic">72</span>
@@ -71,7 +73,7 @@ const AccuracyEngine = () => {
                     </div>
                     <div className="bg-navy-800/80 border border-navy-700/50 rounded-3xl p-10 text-center shadow-2xl backdrop-blur-xl group hover:border-emerald-500/30 transition-all duration-700">
                         <div className="text-[10px] font-mono text-stone-500 hover:text-emerald-400 uppercase tracking-[0.4em] mb-6 font-bold flex items-center justify-center gap-3 transition-colors">
-                            Trust Index <Activity className="w-3.5 h-3.5" />
+                            {t('accuracy.trust')} <Activity className="w-3.5 h-3.5" />
                         </div>
                         <div className="flex items-end justify-center gap-3 group-hover:scale-110 transition-transform duration-500">
                             <span className="font-mono font-black text-7xl sm:text-8xl text-emerald-400 tracking-tighter italic">64</span>
@@ -84,13 +86,13 @@ const AccuracyEngine = () => {
                 <div className="grid lg:grid-cols-2 gap-8 mb-12 reveal visible">
                     <div className="bg-navy-800/80 border border-navy-700/50 rounded-3xl p-8 sm:p-10 shadow-2xl backdrop-blur-md group hover:border-saffron-500/20 transition-all">
                         <h3 className="font-mono text-[10px] font-black text-stone-300 uppercase tracking-[0.25em] mb-10 flex items-center justify-between">
-                            Historical Analytics — Quarterly Trend <Database className="w-4 h-4 text-saffron-500" />
+                            {t('accuracy.history')} <Database className="w-4 h-4 text-saffron-500" />
                         </h3>
                         <div className="h-64 sm:h-80"><Line data={lineData} options={options} /></div>
                     </div>
                     <div className="bg-navy-800/80 border border-navy-700/50 rounded-3xl p-8 sm:p-10 shadow-2xl backdrop-blur-md group hover:border-saffron-500/20 transition-all">
                         <h3 className="font-mono text-[10px] font-black text-stone-300 uppercase tracking-[0.25em] mb-10 flex items-center justify-between">
-                            Department Scorecard <ShieldAlert className="w-4 h-4 text-saffron-500" />
+                            {t('accuracy.scorecard')} <ShieldAlert className="w-4 h-4 text-saffron-500" />
                         </h3>
                         <div className="h-64 sm:h-80"><Bar data={barData} options={options} /></div>
                     </div>
@@ -99,10 +101,10 @@ const AccuracyEngine = () => {
                 <div className="reveal visible group">
                     <div className="flex items-center justify-between mb-8">
                         <h3 className="font-display font-black text-2xl text-stone-50 tracking-tight uppercase group-hover:text-saffron-400 transition-colors">
-                            Department Performance Meta-Breakdown
+                            {t('accuracy.meta')}
                         </h3>
                         <div className="text-[10px] font-mono text-stone-500 uppercase font-black bg-navy-900 px-4 py-2 rounded-xl border border-navy-700 flex items-center gap-2">
-                             Full Telemetry <TrendingUp className="w-3 h-3 text-emerald-500" />
+                             {t('accuracy.telemetry')} <TrendingUp className="w-3 h-3 text-emerald-500" />
                         </div>
                     </div>
                     <div className="overflow-hidden rounded-[2rem] border border-navy-700/50 shadow-2xl backdrop-blur-xl">
@@ -110,18 +112,18 @@ const AccuracyEngine = () => {
                             <table className="w-full text-sm font-mono font-bold text-stone-300">
                                 <thead>
                                     <tr className="bg-navy-950/80 border-b border-navy-700/50">
-                                        <th className="text-left px-8 py-6 text-[10px] uppercase tracking-[0.3em] font-black text-saffron-500 transition-colors">Department</th>
-                                        <th className="text-center px-8 py-6 text-[10px] uppercase tracking-[0.3em] font-black text-stone-500">Accuracy</th>
-                                        <th className="text-center px-8 py-6 text-[10px] uppercase tracking-[0.3em] font-black text-stone-500">Avg Delay</th>
-                                        <th className="text-center px-8 py-6 text-[10px] uppercase tracking-[0.3em] font-black text-stone-500">Risk Profile</th>
+                                        <th className="text-left px-8 py-6 text-[10px] uppercase tracking-[0.3em] font-black text-saffron-500 transition-colors">{t('accuracy.dept')}</th>
+                                        <th className="text-center px-8 py-6 text-[10px] uppercase tracking-[0.3em] font-black text-stone-500">{t('accuracy.acc')}</th>
+                                        <th className="text-center px-8 py-6 text-[10px] uppercase tracking-[0.3em] font-black text-stone-500">{t('accuracy.delay')}</th>
+                                        <th className="text-center px-8 py-6 text-[10px] uppercase tracking-[0.3em] font-black text-stone-500">{t('accuracy.risk')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-navy-700/30">
-                                    <TableRow dept="PWD (Roads)" acc="58%" delay="+22 Days" risk="High" riskColor="text-red-500" />
-                                    <TableRow dept="Water Board" acc="82%" delay="-4 Days" risk="Low" riskColor="text-emerald-500" />
-                                    <TableRow dept="Electricity" acc="75%" delay="+2 Days" risk="Moderate" riskColor="text-saffron-400" />
-                                    <TableRow dept="Sanitation" acc="61%" delay="+14 Days" risk="High" riskColor="text-red-500" />
-                                    <TableRow dept="Parks & Admin" acc="90%" delay="-12 Days" risk="Stable" riskColor="text-emerald-500" />
+                                    <TableRow dept={t('dept.pwd')} acc="58%" delay={`+22 ${t('common.days')}`} risk={t('accuracy.risk_high')} riskColor="text-red-500" />
+                                    <TableRow dept={t('dept.water')} acc="82%" delay={`-4 ${t('common.days')}`} risk={t('accuracy.risk_low')} riskColor="text-emerald-500" />
+                                    <TableRow dept={t('dept.elec')} acc="75%" delay={`+2 ${t('common.days')}`} risk={t('accuracy.risk_mod')} riskColor="text-saffron-400" />
+                                    <TableRow dept={t('dept.sanitation')} acc="61%" delay={`+14 ${t('common.days')}`} risk={t('accuracy.risk_high')} riskColor="text-red-500" />
+                                    <TableRow dept={t('dept.parks')} acc="90%" delay={`-12 ${t('common.days')}`} risk={t('accuracy.risk_stable')} riskColor="text-emerald-500" />
                                 </tbody>
                             </table>
                         </div>

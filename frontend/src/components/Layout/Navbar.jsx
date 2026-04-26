@@ -1,12 +1,12 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 import { Moon, Sun, Search, LogOut, ShieldCheck, User, Menu, X, ChevronDown, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = ({ onOpenLogin }) => {
-    const { darkMode, setDarkMode, user, logout, view, setView } = useContext(AppContext);
-    const getInitialLang = () => document.cookie.includes('googtrans=') ? document.cookie.split('googtrans=/en/')[1]?.split(';')[0] || 'en' : 'en';
-    const [language, setLanguage] = useState(getInitialLang());
+    const { language, setLanguage, darkMode, setDarkMode, user, logout, view, setView } = useContext(AppContext);
+    const { t, i18n } = useTranslation();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
     const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -16,44 +16,20 @@ const Navbar = ({ onOpenLogin }) => {
 
     const handleLanguageChange = (lang) => {
         setLanguage(lang);
-        try {
-            const combo = document.querySelector('.goog-te-combo');
-            if (combo) {
-                combo.value = lang;
-                if (document.createEvent) {
-                    const event = document.createEvent('HTMLEvents');
-                    event.initEvent('change', true, true);
-                    combo.dispatchEvent(event);
-                } else {
-                    combo.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-            } else {
-                console.warn('Translate combo not found. Applying cookie directly.');
-                if (lang === 'en') {
-                    document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                    document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + location.hostname;
-                } else {
-                    document.cookie = `googtrans=/en/${lang}; path=/`;
-                    document.cookie = `googtrans=/en/${lang}; path=/; domain=` + location.hostname;
-                }
-                window.location.reload();
-            }
-        } catch (e) {
-            console.error('Google Translate sync failed:', e);
-        }
+        i18n.changeLanguage(lang);
     };
 
     const NavItems = [
-        { id: 'hero', label: 'Overview' },
-        ...(user?.role === 'Authority' ? [{ id: 'admin-portal', label: 'Admin Portal' }] : []),
-        ...(!user || user.role === 'Citizen' ? [{ id: 'report', label: 'Report Issue' }] : []),
-        { id: 'buzz', label: 'Ward Buzz' },
-        { id: 'projects', label: 'Projects' },
+        { id: 'hero', key: 'navbar.overview' },
+        ...(user?.role === 'Authority' ? [{ id: 'admin-portal', key: 'navbar.admin_portal' }] : []),
+        ...(!user || user.role === 'Citizen' ? [{ id: 'report', key: 'navbar.report_issue' }] : []),
+        { id: 'buzz', key: 'navbar.ward_buzz' },
+        { id: 'projects', key: 'navbar.projects' },
     ];
 
     const MoreItems = [
-        { id: 'accuracy', label: 'Scorecard' },
-        { id: 'archive', label: 'Archive' },
+        { id: 'accuracy', key: 'navbar.scorecard' },
+        { id: 'archive', key: 'navbar.archive' },
     ];
 
     // Active Section Tracking Protocol
@@ -75,6 +51,10 @@ const Navbar = ({ onOpenLogin }) => {
         return () => observer.disconnect();
     }, [view]);
 
+    const getTranslation = (item) => {
+        return t(item.key);
+    };
+
     return (
         <nav id="main-nav" className="fixed top-0 left-0 right-0 z-[9999] bg-navy-800/95 border-b border-navy-600/30 shadow-2xl backdrop-blur-xl transition-all duration-500">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16 sm:h-20">
@@ -87,8 +67,8 @@ const Navbar = ({ onOpenLogin }) => {
                             <span className="text-navy-900 font-mono font-bold text-sm sm:text-base">14</span>
                         </div>
                         <div className="hidden sm:block text-left">
-                            <span className="block font-display font-black text-stone-100 text-sm tracking-tight leading-none">Ward Civic</span>
-                            <span className="block font-mono text-[9px] text-saffron-400 uppercase tracking-widest mt-0.5">Intelligence Portal</span>
+                            <span className="block font-display font-black text-stone-100 text-sm tracking-tight leading-none">{t('navbar.ward_civic')}</span>
+                            <span className="block font-mono text-[9px] text-saffron-400 uppercase tracking-widest mt-0.5">{t('navbar.intelligence_portal')}</span>
                         </div>
                     </button>
                     
@@ -100,7 +80,7 @@ const Navbar = ({ onOpenLogin }) => {
                                 onClick={() => setView('map')}
                                 className={`px-4 py-2 text-[10px] font-mono font-black transition-all uppercase tracking-widest relative group/nav ${activeSection === item.id ? 'text-saffron-500' : 'text-stone-300/80 hover:text-white'}`}
                             >
-                                {item.label}
+                                {getTranslation(item)}
                                 {activeSection === item.id && (
                                     <motion.div layoutId="nav-active" className="absolute bottom-0 left-4 right-4 h-0.5 bg-saffron-500" />
                                 )}
@@ -113,7 +93,7 @@ const Navbar = ({ onOpenLogin }) => {
                                 onClick={() => setIsMoreOpen(!isMoreOpen)}
                                 className="px-4 py-2 text-[10px] font-mono font-black text-stone-300/80 hover:text-white transition-all uppercase tracking-widest flex items-center gap-1"
                             >
-                                More <ChevronDown className={`w-3 h-3 transition-transform ${isMoreOpen ? 'rotate-180' : ''}`} />
+                                {t('navbar.more')} <ChevronDown className={`w-3 h-3 transition-transform ${isMoreOpen ? 'rotate-180' : ''}`} />
                             </button>
                             <AnimatePresence>
                                 {isMoreOpen && (
@@ -130,7 +110,7 @@ const Navbar = ({ onOpenLogin }) => {
                                                 onClick={() => { setView('map'); setIsMoreOpen(false); }}
                                                 className="block px-4 py-3 text-[9px] font-mono font-black text-stone-400 hover:text-saffron-500 hover:bg-navy-800 rounded-lg uppercase tracking-widest transition-all"
                                             >
-                                                {item.label}
+                                                {getTranslation(item)}
                                             </a>
                                         ))}
                                     </motion.div>
@@ -141,7 +121,7 @@ const Navbar = ({ onOpenLogin }) => {
 
                     <div className="relative hidden md:block max-w-sm w-full group">
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-500 w-4 h-4 transition-colors group-focus-within:text-saffron-500" />
-                        <input type="text" placeholder="Search ward activities..." className="w-full bg-navy-900/50 border border-navy-600/30 rounded-full py-2.5 pl-10 pr-4 text-xs text-stone-200 placeholder:text-stone-600 outline-none focus:border-saffron-500/50 focus:ring-4 focus:ring-saffron-500/5 transition-all" />
+                        <input type="text" placeholder={t('navbar.search_placeholder')} className="w-full bg-navy-900/50 border border-navy-600/30 rounded-full py-2.5 pl-10 pr-4 text-xs text-stone-200 placeholder:text-stone-600 outline-none focus:border-saffron-500/50 focus:ring-4 focus:ring-saffron-500/5 transition-all" />
                     </div>
                 </div>
 
@@ -156,20 +136,7 @@ const Navbar = ({ onOpenLogin }) => {
                             className="flex items-center gap-2 px-3 py-2 bg-navy-900 border border-navy-600 rounded-lg hover:border-saffron-500 transition-all shadow-inner group cursor-pointer"
                         >
                             <Globe className="w-4 h-4 text-stone-400 group-hover:text-saffron-500 transition-colors" />
-                            <span className="text-[10px] font-mono font-bold text-stone-300 uppercase tracking-widest">
-                                {
-                                    [
-                                        { code: 'en', label: 'English' },
-                                        { code: 'hi', label: 'हिंदी' },
-                                        { code: 'mr', label: 'मराठी' },
-                                        { code: 'gu', label: 'ગુજરાતી' },
-                                        { code: 'ta', label: 'தமிழ்' },
-                                        { code: 'te', label: 'తెలుగు' },
-                                        { code: 'bn', label: 'বাংলা' },
-                                        { code: 'ur', label: 'اردو' }
-                                    ].find(l => l.code === (language || 'en'))?.label || 'English'
-                                }
-                            </span>
+                            <span className="text-[10px] font-mono font-bold text-stone-300 uppercase tracking-widest">{t('navbar.' + (language === 'hi' ? 'hindi' : language === 'mr' ? 'marathi' : 'english'))}</span>
                             <ChevronDown className={`w-3 h-3 text-stone-500 transition-transform ${langMenuOpen ? 'rotate-180' : ''}`} />
                         </button>
                         
@@ -180,17 +147,12 @@ const Navbar = ({ onOpenLogin }) => {
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                     transition={{ duration: 0.2 }}
-                                    className="absolute top-full right-0 mt-2 w-36 bg-navy-900/95 backdrop-blur-xl border border-navy-600 rounded-xl shadow-2xl overflow-hidden z-[100] max-h-64 overflow-y-auto custom-scrollbar"
+                                    className="absolute top-full right-0 mt-2 w-36 bg-navy-900/95 backdrop-blur-xl border border-navy-600 rounded-xl shadow-2xl overflow-hidden z-[100]"
                                 >
                                     {[
                                         { code: 'en', label: 'English' },
                                         { code: 'hi', label: 'हिंदी' },
-                                        { code: 'mr', label: 'मराठी' },
-                                        { code: 'gu', label: 'ગુજરાતી' },
-                                        { code: 'ta', label: 'தமிழ்' },
-                                        { code: 'te', label: 'తెలుగు' },
-                                        { code: 'bn', label: 'বাংলা' },
-                                        { code: 'ur', label: 'اردو' }
+                                        { code: 'mr', label: 'मराठी' }
                                     ].map(lang => (
                                         <button 
                                             key={lang.code}
@@ -198,7 +160,7 @@ const Navbar = ({ onOpenLogin }) => {
                                                 handleLanguageChange(lang.code);
                                                 setLangMenuOpen(false);
                                             }}
-                                            className={`w-full text-left px-4 py-3 text-[11px] font-mono font-bold uppercase transition-colors tracking-wider flex items-center justify-between shrink-0 ${language === lang.code ? 'bg-saffron-500/10 text-saffron-500 border-l-2 border-saffron-500 pl-3.5' : 'text-stone-300 hover:bg-navy-800 hover:text-white'}`}
+                                            className={`w-full text-left px-4 py-3 text-[11px] font-mono font-bold uppercase transition-colors tracking-wider flex items-center justify-between ${language === lang.code ? 'bg-saffron-500/10 text-saffron-500 border-l-2 border-saffron-500 pl-3.5' : 'text-stone-300 hover:bg-navy-800 hover:text-white'}`}
                                         >
                                             {lang.label}
                                             {language === lang.code && <div className="w-1.5 h-1.5 bg-saffron-500 rounded-full" />}
@@ -215,7 +177,7 @@ const Navbar = ({ onOpenLogin }) => {
                                 onClick={onOpenLogin} 
                                 className="relative z-[10001] bg-saffron-500 text-navy-900 px-6 py-2.5 rounded-xl text-[10px] font-mono font-black uppercase tracking-[0.2em] hover:bg-saffron-400 hover:scale-[1.05] active:scale-95 transition-all shadow-2xl shadow-saffron-500/20 cursor-pointer pointer-events-auto whitespace-nowrap"
                             >
-                                Login
+                                {t('navbar.login')}
                             </button>
                         ) : (
                             <div className="flex items-center gap-3 bg-navy-900/50 pl-4 py-1.5 pr-1.5 rounded-xl border border-navy-700">
@@ -245,10 +207,10 @@ const Navbar = ({ onOpenLogin }) => {
                 <div className="mobile-menu fixed top-16 right-0 bottom-0 w-72 bg-navy-800 z-40 p-6 flex flex-col gap-1 lg:hidden border-l border-navy-700 shadow-2xl transition-transform active">
                     {NavItems.map(item => (
                         <a key={item.id} href={`#${item.id}`} onClick={() => setMobileOpen(false)} className="px-4 py-3 text-sm font-mono text-stone-200 hover:bg-navy-700 rounded transition-colors uppercase tracking-wider">
-                            {item.label}
+                            {getTranslation(item)}
                         </a>
                     ))}
-                    <a href="#archive" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-sm font-mono text-stone-200 hover:bg-navy-700 rounded transition-colors uppercase tracking-wider">Archive</a>
+                    <a href="#archive" onClick={() => setMobileOpen(false)} className="px-4 py-3 text-sm font-mono text-stone-200 hover:bg-navy-700 rounded transition-colors uppercase tracking-wider">{t('navbar.archive')}</a>
                 </div>
             )}
         </nav>

@@ -7,6 +7,7 @@ export const AppContext = createContext();
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
 
 export const AppProvider = ({ children }) => {
+    const [language, setLanguage] = useState(localStorage.getItem('wcip_lang') || 'en');
     const [darkMode, setDarkMode] = useState(localStorage.getItem('wcip_theme') === 'dark');
     const [user, setUser] = useState(() => {
         try {
@@ -24,10 +25,11 @@ export const AppProvider = ({ children }) => {
 
     // Global Preference Persistence
     useEffect(() => {
+        localStorage.setItem('wcip_lang', language);
         localStorage.setItem('wcip_theme', darkMode ? 'dark' : 'light');
         if (darkMode) document.body.classList.add('dark-mode');
         else document.body.classList.remove('dark-mode');
-    }, [darkMode]);
+    }, [language, darkMode]);
 
     const showToast = (message, type = 'info') => {
         setToast({ message, type });
@@ -184,6 +186,7 @@ export const AppProvider = ({ children }) => {
     };
 
     const value = {
+        language, setLanguage,
         darkMode, setDarkMode,
         user, setUser, 
         login, loginWithGoogle, register, logout, updatePassword, getSecurityQuestion, recoverPassword,

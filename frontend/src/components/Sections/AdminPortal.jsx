@@ -1,9 +1,11 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 import { ShieldCheck, Database, FileText, Settings, Users, Activity, BarChart, HardHat, TrendingUp, AlertTriangle } from 'lucide-react';
 
 const AdminPortal = ({ onOpenGenesis }) => {
     const { user, issues, projects, language } = useContext(AppContext);
+    const { t } = useTranslation();
 
     if (!user || user.role !== 'Authority') return null;
 
@@ -13,57 +15,57 @@ const AdminPortal = ({ onOpenGenesis }) => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                     <div className="reveal visible">
-                        <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-500 font-black mb-2 block italic">Strategic Oversight Center</span>
+                        <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-500 font-black mb-2 block italic">{t('admin.oversight')}</span>
                         <h2 className="font-display font-black text-4xl sm:text-5xl text-stone-50 leading-tight flex items-center gap-4">
-                            Authority <span className="text-saffron-500 italic">Interface</span> <ShieldCheck className="w-10 h-10 text-saffron-500 animate-pulse" />
+                            {t('admin.authority')} <span className="text-saffron-500 italic">{t('admin.interface')}</span> <ShieldCheck className="w-10 h-10 text-saffron-500 animate-pulse" />
                         </h2>
                     </div>
                     <div className="flex items-center gap-3 bg-navy-900 px-6 py-3 rounded-2xl border border-navy-700 shadow-2xl">
                         <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"></div>
-                        <span className="text-xs font-mono text-emerald-400 uppercase tracking-[0.2em] font-black italic">Active Node: Command & Control</span>
+                        <span className="text-xs font-mono text-emerald-400 uppercase tracking-[0.2em] font-black italic">{t('admin.active_node')}</span>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 reveal visible">
                     {/* Admin Stats Sidebar */}
                     <div className="lg:col-span-3 space-y-4">
-                        <AdminMiniCard icon={<Users className="w-4 h-4" />} title="Citizen Interactions" value="1,248" color="text-sky-400" />
-                        <AdminMiniCard icon={<Activity className="w-4 h-4" />} title="Response Rate" value="92%" color="text-emerald-400" />
-                        <AdminMiniCard icon={<Database className="w-4 h-4" />} title="System Memory" value="14.2 GB" color="text-saffron-400" />
+                        <AdminMiniCard icon={<Users className="w-4 h-4" />} title={t('admin.interactions')} value="1,248" color="text-sky-400" />
+                        <AdminMiniCard icon={<Activity className="w-4 h-4" />} title={t('admin.response_rate')} value="92%" color="text-emerald-400" />
+                        <AdminMiniCard icon={<Database className="w-4 h-4" />} title={t('admin.sys_memory')} value="14.2 GB" color="text-saffron-400" />
                     </div>
 
                     {/* Operational Table */}
                     <div className="lg:col-span-9 bg-navy-900 rounded-[2.5rem] border border-navy-700 shadow-2xl overflow-hidden group">
                         <div className="p-8 border-b border-navy-800 flex items-center justify-between bg-navy-950/50">
-                            <h3 className="font-mono text-[10px] font-black text-stone-100 uppercase tracking-[0.4em]">Strategic Issue Matrix</h3>
+                            <h3 className="font-mono text-[10px] font-black text-stone-100 uppercase tracking-[0.4em]">{t('admin.matrix')}</h3>
                             <div className="flex gap-2">
-                                <span className="px-3 py-1 bg-navy-800 rounded-lg text-[9px] font-mono text-stone-500 border border-navy-700 uppercase">Export XLSX</span>
-                                <span className="px-3 py-1 bg-navy-800 rounded-lg text-[9px] font-mono text-stone-500 border border-navy-700 uppercase">PDF Log</span>
+                                <span className="px-3 py-1 bg-navy-800 rounded-lg text-[9px] font-mono text-stone-500 border border-navy-700 uppercase">{t('admin.export_xlsx')}</span>
+                                <span className="px-3 py-1 bg-navy-800 rounded-lg text-[9px] font-mono text-stone-500 border border-navy-700 uppercase">{t('admin.pdf_log')}</span>
                             </div>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-xs font-mono font-bold text-stone-300">
                                 <thead className="bg-navy-950/80 border-b border-navy-800">
                                     <tr>
-                                        <th className="px-8 py-5 text-stone-500 uppercase tracking-widest text-[10px]">Reference</th>
-                                        <th className="px-8 py-5 text-stone-500 uppercase tracking-widest text-[10px]">Category</th>
-                                        <th className="px-8 py-5 text-stone-500 uppercase tracking-widest text-[10px]">Priority</th>
-                                        <th className="px-8 py-5 text-stone-500 uppercase tracking-widest text-[10px]">Status Protocol</th>
-                                        <th className="px-8 py-5 text-stone-500 uppercase tracking-widest text-[10px]">Actions</th>
+                                        <th className="px-8 py-5 text-stone-500 uppercase tracking-widest text-[10px]">{t('admin.ref')}</th>
+                                        <th className="px-8 py-5 text-stone-500 uppercase tracking-widest text-[10px]">{t('admin.cat')}</th>
+                                        <th className="px-8 py-5 text-stone-500 uppercase tracking-widest text-[10px]">{t('admin.priority')}</th>
+                                        <th className="px-8 py-5 text-stone-500 uppercase tracking-widest text-[10px]">{t('admin.protocol')}</th>
+                                        <th className="px-8 py-5 text-stone-500 uppercase tracking-widest text-[10px]">{t('admin.actions')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-navy-800/50">
                                     {issues?.slice(0, 5).map(issue => (
                                         <tr key={issue.id} className="hover:bg-navy-800/30 transition-all group/row cursor-default">
                                             <td className="px-8 py-5 text-stone-100 font-black">{issue.id}</td>
-                                            <td className="px-8 py-5"><span className="text-stone-400">{issue.category}</span></td>
+                                            <td className="px-8 py-5"><span className="text-stone-400">{t(`cat.${(issue.category || '').toLowerCase().replace(' ', '_')}`)}</span></td>
                                             <td className="px-8 py-5">
-                                                <span className={`px-2 py-0.5 rounded-md border text-[9px] shadow-sm ${(issue.priority || 'Normal').toUpperCase() === 'HIGH' || (issue.priority || 'Normal').toUpperCase() === 'EMERGENCY' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-navy-700 text-stone-400 border-navy-600'}`}>{(issue.priority || 'Normal').toUpperCase()}</span>
+                                                <span className={`px-2 py-0.5 rounded-md border text-[9px] shadow-sm ${(issue.priority || 'Normal').toUpperCase() === 'HIGH' || (issue.priority || 'Normal').toUpperCase() === 'EMERGENCY' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-navy-700 text-stone-400 border-navy-600'}`}>{t(`report.priority_${(issue.priority || 'Normal').toLowerCase()}`)}</span>
                                             </td>
                                             <td className="px-8 py-5">
                                                 <div className="flex items-center gap-2">
                                                     <div className={`w-1.5 h-1.5 rounded-full ${issue.status === 'Resolved' ? 'bg-emerald-500 shadow-lg shadow-emerald-500/50' : 'bg-saffron-500 animate-pulse'}`}></div>
-                                                    <span className="uppercase text-[10px] tracking-tighter">{issue.status}</span>
+                                                    <span className="uppercase text-[10px] tracking-tighter">{t(`status.${(issue.status || '').toLowerCase().replace(' ', '_')}`)}</span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-5">
@@ -80,12 +82,23 @@ const AdminPortal = ({ onOpenGenesis }) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <AdminToolCard 
                         icon={<HardHat className="w-6 h-6" />} 
-                        title="Project Deployment" 
-                        desc="Adjust strategic budgets, deadlines, and agency permissions." 
+                        title={t('admin.proj_deployment')} 
+                        desc={t('admin.proj_desc')} 
                         onClick={onOpenGenesis}
+                        btnText={t('admin.launch')}
                     />
-                    <AdminToolCard icon={<TrendingUp className="w-6 h-6" />} title="Analytics Studio" desc="Synthesize ward performance data into quarterly reports." />
-                    <AdminToolCard icon={<AlertTriangle className="w-6 h-6" />} title="Crisis Protocol" desc="Dispatch emergency alerts and ward-wide notifications." />
+                    <AdminToolCard 
+                        icon={<TrendingUp className="w-6 h-6" />} 
+                        title={t('admin.analytics_studio')} 
+                        desc={t('admin.analytics_desc')} 
+                        btnText={t('admin.launch')}
+                    />
+                    <AdminToolCard 
+                        icon={<AlertTriangle className="w-6 h-6" />} 
+                        title={t('admin.crisis')} 
+                        desc={t('admin.crisis_desc')} 
+                        btnText={t('admin.launch')}
+                    />
                 </div>
             </div>
         </section>
@@ -103,7 +116,7 @@ const AdminMiniCard = ({ icon, title, value, color }) => (
     </div>
 );
 
-const AdminToolCard = ({ icon, title, desc, onClick }) => (
+const AdminToolCard = ({ icon, title, desc, onClick, btnText }) => (
     <div 
         onClick={onClick}
         className="bg-navy-900/50 backdrop-blur-xl border border-navy-700 p-8 rounded-[2rem] shadow-xl group hover:border-saffron-500/20 transition-all hover:translate-y-[-4px] cursor-pointer"
@@ -111,7 +124,7 @@ const AdminToolCard = ({ icon, title, desc, onClick }) => (
         <div className="w-14 h-14 bg-navy-800 border border-navy-700 rounded-2xl flex items-center justify-center text-saffron-500 mb-6 group-hover:scale-110 shadow-2xl transition-transform">{icon}</div>
         <h4 className="font-display font-black text-xl text-stone-50 mb-3 tracking-tight uppercase group-hover:text-saffron-500 transition-colors">{title}</h4>
         <p className="text-[11px] font-mono text-stone-500 font-bold uppercase tracking-widest leading-loose">{desc}</p>
-        <button className="mt-8 text-[9px] font-mono font-black text-saffron-500 uppercase tracking-[0.3em] flex items-center gap-2 group/btn">Launch Console <Settings className="w-3.5 h-3.5 group-hover/btn:rotate-180 transition-transform duration-700" /></button>
+        <button className="mt-8 text-[9px] font-mono font-black text-saffron-500 uppercase tracking-[0.3em] flex items-center gap-2 group/btn">{btnText} <Settings className="w-3.5 h-3.5 group-hover/btn:rotate-180 transition-transform duration-700" /></button>
     </div>
 );
 

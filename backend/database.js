@@ -27,14 +27,29 @@ try {
     console.log('Database Migration: Project Allocation Node Synchronized.');
 } catch (e) {}
 
+// MIGRATION: Add tri-lingual columns to issues
+const issueCols = ['street_hi', 'street_mr', 'landmark_hi', 'landmark_mr', 'description_hi', 'description_mr'];
+issueCols.forEach(col => {
+    try {
+        db.prepare(`ALTER TABLE issues ADD COLUMN ${col} TEXT`).run();
+        console.log(`Database Migration: Issue Column ${col} Synchronized.`);
+    } catch (e) {}
+});
+
 db.exec(`
     CREATE TABLE IF NOT EXISTS issues (
         id TEXT PRIMARY KEY,
         category TEXT,
         street TEXT,
+        street_hi TEXT,
+        street_mr TEXT,
         landmark TEXT,
+        landmark_hi TEXT,
+        landmark_mr TEXT,
         pincode TEXT,
         description TEXT,
+        description_hi TEXT,
+        description_mr TEXT,
         file_path TEXT,
         priority TEXT,
         anonymous INTEGER,

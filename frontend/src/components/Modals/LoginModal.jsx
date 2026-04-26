@@ -1,10 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../../context/AppContext';
+import { useTranslation } from 'react-i18next';
 import { X, ShieldHalf, User, Key, Mail, ChevronRight, RefreshCw, Loader2, ShieldQuestion, Fingerprint } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LoginModal = ({ isOpen, onClose }) => {
     const { login, loginWithGoogle, register, updatePassword, getSecurityQuestion, recoverPassword, user, language, showToast } = useContext(AppContext);
+    const { t } = useTranslation();
     
     // Modes: login, register, forgot_step1, forgot_step2, change
     const [mode, setMode] = useState('login'); 
@@ -98,10 +100,10 @@ const LoginModal = ({ isOpen, onClose }) => {
                             {mode === 'login' ? <ShieldHalf className="text-navy-900 w-8 h-8" /> : mode === 'register' ? <Fingerprint className="text-navy-900 w-8 h-8" /> : <ShieldQuestion className="text-navy-900 w-8 h-8" />}
                         </div>
                         <h3 className="font-display font-black text-2xl text-stone-50 tracking-tight uppercase">
-                            {mode === 'login' ? 'Identity Control' : mode === 'register' ? 'Protocol Genesis' : 'Security Clearance'}
+                            {mode === 'login' ? t('login.identity_control') : mode === 'register' ? t('login.protocol_genesis') : t('login.security_clearance')}
                         </h3>
                         <p className="text-[9px] font-mono text-saffron-500 uppercase tracking-widest mt-2 opacity-80 font-black italic">
-                            Verifying Civic Node Access
+                            {t('login.verifying')}
                         </p>
                     </div>
                 </div>
@@ -111,21 +113,21 @@ const LoginModal = ({ isOpen, onClose }) => {
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {mode === 'register' && (
                             <div className="group">
-                                <label className={labelClasses}><User className="w-3.5 h-3.5" /> Full Designation (Name)</label>
-                                <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder="Agent Name" className={inputClasses} />
+                                <label className={labelClasses}><User className="w-3.5 h-3.5" /> {t('login.fullname')}</label>
+                                <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder={t('login.agent_name')} className={inputClasses} />
                             </div>
                         )}
 
                         {(mode !== 'change' && mode !== 'forgot_step2') && (
                             <div className="group">
-                                <label className={labelClasses}><Mail className="w-3.5 h-3.5" /> Identity Node (Email)</label>
-                                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="node@ward14.in" className={inputClasses} />
+                                <label className={labelClasses}><Mail className="w-3.5 h-3.5" /> {t('login.email')}</label>
+                                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder={t('login.email_placeholder')} className={inputClasses} />
                             </div>
                         )}
 
                         {mode === 'forgot_step2' && (
                             <div className="bg-navy-900/5 dark:bg-navy-900/40 p-5 rounded-2xl border border-navy-500/10 mb-4">
-                                <p className="text-[10px] font-mono text-stone-400 uppercase tracking-widest mb-1">Identity Question:</p>
+                                <p className="text-[10px] font-mono text-stone-400 uppercase tracking-widest mb-1">{t('login.question')}</p>
                                 <p className="text-sm font-bold text-navy-900 dark:text-stone-100">{recoveryQuestion}</p>
                             </div>
                         )}
@@ -139,28 +141,28 @@ const LoginModal = ({ isOpen, onClose }) => {
 
                         {((mode === 'register' || mode === 'forgot_step2' || mode === 'change')) && (
                             <div className="group">
-                                <label className={labelClasses}><ShieldQuestion className="w-3.5 h-3.5" /> {mode === 'register' ? 'Strategic Question' : 'Identity Answer'}</label>
+                                <label className={labelClasses}><ShieldQuestion className="w-3.5 h-3.5" /> {mode === 'register' ? t('login.strat_question') : t('login.id_answer')}</label>
                                 {mode === 'register' && (
                                     <select value={securityQuestion} onChange={e => setSecurityQuestion(e.target.value)} className={`${inputClasses} mb-3`}>
-                                        <option>What was your first pet?</option>
-                                        <option>Your childhood hero?</option>
-                                        <option>City of birth?</option>
+                                        <option>{t('login.pet')}</option>
+                                        <option>{t('login.hero')}</option>
+                                        <option>{t('login.birth')}</option>
                                     </select>
                                 )}
-                                <input type="text" value={securityAnswer} onChange={e => setSecurityAnswer(e.target.value)} required placeholder="Secure Verification Answer" className={inputClasses} />
+                                <input type="text" value={securityAnswer} onChange={e => setSecurityAnswer(e.target.value)} required placeholder={t('login.answer_placeholder')} className={inputClasses} />
                             </div>
                         )}
 
                         {(mode !== 'forgot_step1') && (
                             <div className="group">
-                                <label className={labelClasses}><Key className="w-3.5 h-3.5" /> {mode === 'forgot_step2' || mode === 'change' ? 'New Security Key' : 'Security Key'}</label>
+                                <label className={labelClasses}><Key className="w-3.5 h-3.5" /> {mode === 'forgot_step2' || mode === 'change' ? t('login.new_key') : t('login.security_key')}</label>
                                 <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••" className={inputClasses} />
                             </div>
                         )}
 
                         {(mode === 'register' || mode === 'forgot_step2' || mode === 'change') && (
                             <div className="group">
-                                <label className={labelClasses}><RefreshCw className="w-3.5 h-3.5" /> Verify New Key</label>
+                                <label className={labelClasses}><RefreshCw className="w-3.5 h-3.5" /> {t('login.verify_key')}</label>
                                 <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder="••••••••" className={inputClasses} />
                             </div>
                         )}
@@ -169,7 +171,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                             type="submit" 
                             className="w-full bg-navy-900 dark:bg-saffron-500 text-white dark:text-navy-900 font-black py-5 rounded-2xl text-[10px] font-mono uppercase tracking-[0.3em] hover:bg-navy-800 dark:hover:bg-saffron-400 transition-all flex items-center justify-center gap-3 shadow-2xl active:scale-[0.98]"
                         >
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : mode === 'login' ? 'Authenticate' : mode === 'forgot_step1' ? 'Synthesize' : 'Initialize Protocol'}
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : mode === 'login' ? t('login.authenticate') : mode === 'forgot_step1' ? t('login.synthesize') : t('login.init_protocol')}
                             {!loading && <ChevronRight className="w-4 h-4" />}
                         </button>
 
@@ -180,7 +182,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                                 className="w-full bg-white dark:bg-navy-900 text-navy-900 dark:text-stone-100 font-bold py-5 rounded-2xl text-[10px] font-mono uppercase tracking-[0.2em] border border-stone-200 dark:border-navy-700 hover:bg-stone-50 dark:hover:bg-navy-950 transition-all flex items-center justify-center gap-4 mt-2"
                             >
                                 <svg viewBox="0 0 48 48" className="w-4 h-4" xmlns="http://www.w3.org/2000/svg"><path d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z" fill="#4285F4"/><path d="m6.3 12.9 7.2 5.3C15.2 15.1 19.3 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 15.8 2 8.9 6.2 6.3 12.9z" fill="#EA4335"/><path d="M24 46c5.9 0 11.1-2.2 15-5.9l-7.1-6c-2.2 1.6-5 2.5-7.9 2.5-6.5 0-11.9-4.2-13.9-10l-7.3 5.6C7.9 39.8 15.4 46 24 46z" fill="#34A853"/><path d="M10.1 26.6c-.6-1.8-.9-3.7-.9-5.6s.3-3.8.9-5.6l-7.2-5.3C1.1 13.9 0 18.8 0 24s1.1 10.1 2.9 13.9l7.2-5.3z" fill="#FBBC05"/></svg>
-                                Sign in with Google Protocol
+                                {t('login.google_sign_in')}
                             </button>
                         )}
                     </form>
@@ -192,11 +194,11 @@ const LoginModal = ({ isOpen, onClose }) => {
                         <div className="flex gap-4">
                             {mode === 'login' ? (
                                 <>
-                                    <button type="button" onClick={() => resetMode('register')} className="text-[9px] font-mono font-bold text-stone-500 hover:text-saffron-500 uppercase tracking-widest">New Enrollment</button>
-                                    <button type="button" onClick={() => resetMode('forgot_step1')} className="text-[9px] font-mono font-bold text-stone-500 hover:text-saffron-500 uppercase tracking-widest">Lost Key</button>
+                                    <button type="button" onClick={() => resetMode('register')} className="text-[9px] font-mono font-bold text-stone-500 hover:text-saffron-500 uppercase tracking-widest">{t('login.new_enrollment')}</button>
+                                    <button type="button" onClick={() => resetMode('forgot_step1')} className="text-[9px] font-mono font-bold text-stone-500 hover:text-saffron-500 uppercase tracking-widest">{t('login.lost_key')}</button>
                                 </>
                             ) : (
-                                <button type="button" onClick={() => resetMode('login')} className="text-[9px] font-mono font-black text-saffron-500 uppercase tracking-widest">Return to Base Node</button>
+                                <button type="button" onClick={() => resetMode('login')} className="text-[9px] font-mono font-black text-saffron-500 uppercase tracking-widest">{t('login.return_base')}</button>
                             )}
                         </div>
                     </div>
