@@ -3,7 +3,7 @@ import { AppContext } from '../../context/AppContext';
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck, Database, FileText, Settings, Users, Activity, BarChart, HardHat, TrendingUp, AlertTriangle } from 'lucide-react';
 
-const AdminPortal = ({ onOpenGenesis }) => {
+const AdminPortal = ({ onOpenGenesis, onOpenWorkspaceEdit }) => {
     const { user, issues, projects, language } = useContext(AppContext);
     const { t } = useTranslation();
 
@@ -79,7 +79,7 @@ const AdminPortal = ({ onOpenGenesis }) => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <AdminToolCard 
                         icon={<HardHat className="w-6 h-6" />} 
                         title={t('admin.proj_deployment')} 
@@ -98,6 +98,13 @@ const AdminPortal = ({ onOpenGenesis }) => {
                         title={t('admin.crisis')} 
                         desc={t('admin.crisis_desc')} 
                         btnText={t('admin.launch')}
+                    />
+                    <AdminToolCard 
+                        icon={<Settings className="w-6 h-6" />} 
+                        title="Workspace Configuration" 
+                        desc="Personalize ward aesthetics, demographics, and contact protocols." 
+                        onClick={onOpenWorkspaceEdit}
+                        btnText="Configure"
                     />
                 </div>
             </div>

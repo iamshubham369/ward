@@ -22,6 +22,7 @@ export const AppProvider = ({ children }) => {
     const [view, setView] = useState('map');
     const [notifications, setNotifications] = useState([]);
     const [toast, setToast] = useState(null);
+    const [currentWorkspace, setCurrentWorkspace] = useState(null);
 
     // Global Preference Persistence
     useEffect(() => {
@@ -38,32 +39,47 @@ export const AppProvider = ({ children }) => {
 
     // --- RECOVERY & AUTH PROTOCOLS ---
     
-    const fetchIssues = async () => {
+    const fetchIssues = async (workspaceId) => {
         try {
-            const res = await axios.get(`${API_BASE}/issues`);
+            const wid = workspaceId || currentWorkspace?.id || 'nagpur';
+            const res = await axios.get(`${API_BASE}/issues?workspace_id=${wid}`);
             setIssues(res.data);
         } catch (e) { console.error('Fetch Protocol Failure: Issues node offline'); }
     };
 
-    const fetchProjects = async () => {
+    const fetchProjects = async (workspaceId) => {
         try {
-            const res = await axios.get(`${API_BASE}/projects`);
+            const wid = workspaceId || currentWorkspace?.id || 'nagpur';
+            const res = await axios.get(`${API_BASE}/projects?workspace_id=${wid}`);
             setProjects(res.data);
         } catch (e) { console.error('Fetch Protocol Failure: Project nodes offline'); }
     };
 
-    const fetchNotifications = async () => {
+    const fetchNotifications = async (workspaceId) => {
         try {
-            const res = await axios.get(`${API_BASE}/notifications`);
+            const wid = workspaceId || currentWorkspace?.id || 'nagpur';
+            const res = await axios.get(`${API_BASE}/notifications?workspace_id=${wid}`);
             setNotifications(res.data);
         } catch (e) { console.error('Fetch Protocol Failure: Advisory nodes offline'); }
     };
 
+    const fetchWorkspaceData = async (workspaceId) => {
+        try {
+            const res = await axios.get(`${API_BASE}/workspaces/${workspaceId}`);
+            setCurrentWorkspace(res.data);
+        } catch (e) {
+            console.error('Fetch Protocol Failure: Workspace node offline');
+            setCurrentWorkspace({ city: 'Nagpur', ward_name: 'Ward 14', theme: 'Tactical Dark', id: 'nagpur' });
+        }
+    };
+
     useEffect(() => {
-        fetchIssues();
-        fetchProjects();
-        fetchNotifications();
-    }, []);
+        if (currentWorkspace) {
+            fetchIssues(currentWorkspace.id);
+            fetchProjects(currentWorkspace.id);
+            fetchNotifications(currentWorkspace.id);
+        }
+    }, [currentWorkspace]);
 
     const login = async (email, password) => {
         try {
@@ -159,9 +175,10 @@ export const AppProvider = ({ children }) => {
     // Exported Strategic State
     const addProject = async (projectData) => {
         try {
-            const res = await axios.post(`${API_BASE}/projects`, projectData);
+            const dataWithWorkspace = { ...projectData, workspace_id: currentWorkspace?.id || 'nagpur' };
+            const res = await axios.post(`${API_BASE}/projects`, dataWithWorkspace);
             if (res.data.success) {
-                fetchProjects();
+                fetchProjects(currentWorkspace?.id);
                 showToast('Strategic Project Commissioned', 'success');
                 return true;
             }
@@ -195,7 +212,8 @@ export const AppProvider = ({ children }) => {
         selectedProjectId, setSelectedProjectId,
         view, setView,
         notifications, fetchNotifications,
-        toast, showToast, API_BASE
+        toast, showToast, API_BASE,
+        currentWorkspace, fetchWorkspaceData
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

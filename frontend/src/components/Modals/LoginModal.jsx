@@ -20,6 +20,7 @@ const LoginModal = ({ isOpen, onClose }) => {
     const [securityQuestion, setSecurityQuestion] = useState('What was your first pet?');
     const [securityAnswer, setSecurityAnswer] = useState('');
     const [recoveryQuestion, setRecoveryQuestion] = useState('');
+    const [role, setRole] = useState('Citizen');
 
     useEffect(() => {
         if (isOpen) {
@@ -35,6 +36,7 @@ const LoginModal = ({ isOpen, onClose }) => {
         setPassword('');
         setConfirmPassword('');
         setSecurityAnswer('');
+        setRole('Citizen');
         setLoading(false);
     };
 
@@ -63,7 +65,7 @@ const LoginModal = ({ isOpen, onClose }) => {
                 if (success) onClose();
             } else if (mode === 'register') {
                 if (password !== confirmPassword) throw new Error('Key mismatch: Passwords do not align');
-                const success = await register({ name, email, password, security_question: securityQuestion, security_answer: securityAnswer });
+                const success = await register({ name, email, password, security_question: securityQuestion, security_answer: securityAnswer, role });
                 if (success) onClose();
             } else if (mode === 'forgot_step2') {
                 if (password !== confirmPassword) throw new Error('Key mismatch: Passwords do not align');
@@ -112,10 +114,25 @@ const LoginModal = ({ isOpen, onClose }) => {
                 <div className="p-8 md:p-12 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-transparent">
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {mode === 'register' && (
-                            <div className="group">
-                                <label className={labelClasses}><User className="w-3.5 h-3.5" /> {t('login.fullname')}</label>
-                                <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder={t('login.agent_name')} className={inputClasses} />
-                            </div>
+                            <>
+                                <div className="group">
+                                    <label className={labelClasses}><User className="w-3.5 h-3.5" /> {t('login.fullname')}</label>
+                                    <input type="text" value={name} onChange={e => setName(e.target.value)} required placeholder={t('login.agent_name')} className={inputClasses} />
+                                </div>
+                                <div className="group">
+                                    <label className={labelClasses}><ShieldHalf className="w-3.5 h-3.5" /> Identity Role</label>
+                                    <div className="flex gap-4">
+                                        <label className={`flex-1 cursor-pointer border ${role === 'Citizen' ? 'border-saffron-500 bg-saffron-500/10 text-saffron-500' : 'border-stone-200 dark:border-navy-700 bg-white dark:bg-navy-950 text-stone-500'} rounded-xl py-3 text-center transition-all hover:border-saffron-500/50`}>
+                                            <input type="radio" name="role" value="Citizen" checked={role === 'Citizen'} onChange={e => setRole(e.target.value)} className="sr-only" />
+                                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Citizen</span>
+                                        </label>
+                                        <label className={`flex-1 cursor-pointer border ${role === 'Authority' ? 'border-saffron-500 bg-saffron-500/10 text-saffron-500' : 'border-stone-200 dark:border-navy-700 bg-white dark:bg-navy-950 text-stone-500'} rounded-xl py-3 text-center transition-all hover:border-saffron-500/50`}>
+                                            <input type="radio" name="role" value="Authority" checked={role === 'Authority'} onChange={e => setRole(e.target.value)} className="sr-only" />
+                                            <span className="text-[10px] font-mono font-bold uppercase tracking-widest">Authority</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </>
                         )}
 
                         {(mode !== 'change' && mode !== 'forgot_step2') && (

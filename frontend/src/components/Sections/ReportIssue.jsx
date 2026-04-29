@@ -5,7 +5,7 @@ import { MapPin, Check, Upload, Shield, Satellite, FileText, Search, Wrench, Cir
 import axios from 'axios';
 
 const ReportIssue = () => {
-    const { language, showToast, API_BASE, fetchIssues } = useContext(AppContext);
+    const { language, showToast, API_BASE, fetchIssues, currentWorkspace } = useContext(AppContext);
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -51,6 +51,7 @@ const ReportIssue = () => {
         data.append('description', formData.description);
         data.append('priority', formData.priority);
         data.append('anonymous', formData.anonymous);
+        data.append('workspace_id', currentWorkspace?.id || 'nagpur');
         if (formData.file) data.append('file', formData.file);
 
         try {

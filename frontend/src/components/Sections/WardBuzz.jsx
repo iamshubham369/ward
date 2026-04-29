@@ -5,10 +5,12 @@ import { ThumbsUp, MessageSquare, MapPin, Calendar, CheckCircle2, Siren, ArrowRi
 import axios from 'axios';
 
 const WardBuzz = () => {
-    const { issues, language, API_BASE, fetchIssues, user, showToast } = useContext(AppContext);
+    const { issues, language, API_BASE, fetchIssues, user, showToast, currentWorkspace } = useContext(AppContext);
     const { t } = useTranslation();
     const [filterCat, setFilterCat] = useState('all');
     const [filterStatus, setFilterStatus] = useState('all');
+    const [questionText, setQuestionText] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleUpvote = async (id) => {
         try {
@@ -27,6 +29,35 @@ const WardBuzz = () => {
             fetchIssues();
             showToast(`Status Protocol Updated: ${status}`, 'success');
         } catch (e) { console.error(e); }
+    };
+
+    const handleAskQuestion = async (e) => {
+        e.preventDefault();
+        if (!questionText.trim()) return;
+        
+        setIsSubmitting(true);
+        const tid = 'Q-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        const data = new FormData();
+        data.append('id', tid);
+        data.append('category', 'Question');
+        data.append('street', 'Community Board');
+        data.append('landmark', 'N/A');
+        data.append('pincode', '000000');
+        data.append('description', questionText);
+        data.append('priority', 'Low');
+        data.append('anonymous', false);
+        data.append('workspace_id', currentWorkspace?.id || 'nagpur');
+
+        try {
+            await axios.post(`${API_BASE}/issues`, data);
+            setQuestionText('');
+            showToast('Question broadcasted to Authorities', 'success');
+            fetchIssues();
+        } catch (err) {
+            showToast('Failed to broadcast question', 'error');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const filteredIssues = issues ? issues.filter(i => {
@@ -76,6 +107,28 @@ const WardBuzz = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
                     <div className="lg:col-span-3 space-y-6">
+
+                        {user?.role === 'Citizen' && (
+                            <div className="bg-navy-900/80 border border-navy-700 rounded-3xl p-6 md:p-8 mb-4 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-saffron-500/5 rounded-full -translate-y-16 translate-x-16 blur-3xl"></div>
+                                <h3 className="font-display font-black text-xl text-stone-50 tracking-tight uppercase flex items-center gap-2 mb-4 relative z-10"><MessageSquare className="w-5 h-5 text-saffron-500" /> {t('buzz.ask_authority') || 'Ask Authority / Community Buzz'}</h3>
+                                <form onSubmit={handleAskQuestion} className="relative z-10 flex flex-col gap-4">
+                                    <textarea 
+                                        value={questionText} 
+                                        onChange={e => setQuestionText(e.target.value)} 
+                                        placeholder={t('buzz.ask_placeholder') || "What's on your mind? Ask a question or share an update..."}
+                                        className="w-full bg-navy-950 border border-navy-800 rounded-xl px-4 py-3 text-sm text-stone-200 placeholder:text-stone-600 focus:outline-none focus:border-saffron-500 focus:ring-1 focus:ring-saffron-500 transition-all resize-none"
+                                        rows="3"
+                                        required
+                                    ></textarea>
+                                    <div className="flex justify-end">
+                                        <button type="submit" disabled={isSubmitting} className="bg-saffron-500 hover:bg-saffron-400 text-navy-900 font-black px-6 py-2.5 rounded-xl text-[10px] font-mono uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 flex items-center gap-2 disabled:opacity-50">
+                                            {isSubmitting ? 'Broadcasting...' : 'Broadcast'} <ArrowRight className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
 
                         {filteredIssues.length === 0 ? (
                             <div className="bg-navy-900/50 border-2 border-dashed border-navy-700 p-20 rounded-3xl text-center flex flex-col items-center justify-center grayscale opacity-50">

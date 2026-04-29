@@ -62,13 +62,14 @@ app.post('/api/auth/google', (req, res) => {
 
 // AUTH - REGISTER
 app.post('/api/auth/register', (req, res) => {
-    const { name, email, password, security_question, security_answer } = req.body;
+    const { name, email, password, security_question, security_answer, role } = req.body;
     try {
         const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
         if (existing) return res.status(400).json({ success: false, message: 'Identity Already Protocolled' });
 
-        const result = db.prepare('INSERT INTO users (name, email, password, role, security_question, security_answer) VALUES (?, ?, ?, ?, ?, ?)').run(name, email, password, 'Citizen', security_question, security_answer);
-        const user = { id: result.lastInsertRowid, name, email, role: 'Citizen' };
+        const userRole = role === 'Authority' ? 'Authority' : 'Citizen';
+        const result = db.prepare('INSERT INTO users (name, email, password, role, security_question, security_answer) VALUES (?, ?, ?, ?, ?, ?)').run(name, email, password, userRole, security_question, security_answer);
+        const user = { id: result.lastInsertRowid, name, email, role: userRole };
         res.json({ success: true, user });
     } catch (e) {
         res.status(500).json({ success: false, message: 'Protocol Insertion Error' });
@@ -112,18 +113,19 @@ app.post('/api/auth/update-password', (req, res) => {
 
 // ISSUES
 app.get('/api/issues', (req, res) => {
-    const issues = db.prepare('SELECT * FROM issues ORDER BY timestamp DESC').all();
+    const { workspace_id } = req.query;
+    const issues = db.prepare('SELECT * FROM issues WHERE workspace_id = ? ORDER BY timestamp DESC').all(workspace_id || 'nagpur');
     res.json(issues);
 });
 
 app.post('/api/issues', upload.single('file'), (req, res) => {
-    const { id, category, street, landmark, pincode, description, priority, anonymous, lat, lng } = req.body;
+    const { id, category, street, landmark, pincode, description, priority, anonymous, lat, lng, workspace_id } = req.body;
     const file_path = req.file ? `/uploads/${req.file.filename}` : null;
     
     db.prepare(`
-        INSERT INTO issues (id, category, street, landmark, pincode, description, file_path, priority, anonymous, lat, lng)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(id, category, street, landmark, pincode, description, file_path, priority, anonymous == 'true' ? 1 : 0, lat, lng);
+        INSERT INTO issues (id, category, street, landmark, pincode, description, file_path, priority, anonymous, lat, lng, workspace_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(id, category, street, landmark, pincode, description, file_path, priority, anonymous == 'true' ? 1 : 0, lat, lng, workspace_id || 'nagpur');
     
     res.json({ success: true });
 });
@@ -143,16 +145,17 @@ app.post('/api/issues/status/:id', (req, res) => {
 
 // PROJECTS
 app.get('/api/projects', (req, res) => {
-    const projects = db.prepare('SELECT * FROM projects ORDER BY start_date DESC').all();
+    const { workspace_id } = req.query;
+    const projects = db.prepare('SELECT * FROM projects WHERE workspace_id = ? ORDER BY start_date DESC').all(workspace_id || 'nagpur');
     res.json(projects);
 });
 
 app.post('/api/projects', (req, res) => {
-    const { name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details } = req.body;
+    const { name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details, workspace_id } = req.body;
     db.prepare(`
-        INSERT INTO projects (name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details || '{}');
+        INSERT INTO projects (name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details, workspace_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details || '{}', workspace_id || 'nagpur');
     res.json({ success: true });
 });
 
@@ -176,14 +179,73 @@ app.put('/api/projects/:id', (req, res) => {
 
 // NOTIFICATIONS
 app.get('/api/notifications', (req, res) => {
-    const notifs = db.prepare('SELECT * FROM notifications ORDER BY timestamp DESC LIMIT 5').all();
+    const { workspace_id } = req.query;
+    const notifs = db.prepare('SELECT * FROM notifications WHERE workspace_id = ? ORDER BY timestamp DESC LIMIT 5').all(workspace_id || 'nagpur');
     res.json(notifs);
 });
 
 app.post('/api/notifications', (req, res) => {
-    const { text, icon, color } = req.body;
-    db.prepare('INSERT INTO notifications (text, icon, color) VALUES (?, ?, ?)').run(text, icon, color);
+    const { text, icon, color, workspace_id } = req.body;
+    db.prepare('INSERT INTO notifications (text, icon, color, workspace_id) VALUES (?, ?, ?, ?)').run(text, icon, color, workspace_id || 'nagpur');
     res.json({ success: true });
+});
+
+// WORKSPACES
+app.post('/api/workspaces', (req, res) => {
+    const { id, city, ward_name, admin_email, theme, admin_name, population_estimate, ward_description, contact_number } = req.body;
+    try {
+        db.prepare(`
+            INSERT INTO workspaces (id, city, ward_name, admin_email, theme, admin_name, population_estimate, ward_description, contact_number) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(id, city, ward_name, admin_email, theme, admin_name, population_estimate || 0, ward_description, contact_number);
+        res.json({ success: true, workspaceId: id });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ success: false, message: 'Failed to provision workspace' });
+    }
+});
+
+app.put('/api/workspaces/:id', (req, res) => {
+    const { id } = req.params;
+    const { city, ward_name, admin_email, theme, admin_name, population_estimate, ward_description, contact_number } = req.body;
+    try {
+        db.prepare(`
+            UPDATE workspaces 
+            SET city = ?, ward_name = ?, admin_email = ?, theme = ?, admin_name = ?, population_estimate = ?, ward_description = ?, contact_number = ?
+            WHERE id = ?
+        `).run(city, ward_name, admin_email, theme, admin_name, population_estimate || 0, ward_description, contact_number, id);
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ success: false, message: 'Failed to update workspace' });
+    }
+});
+
+app.get('/api/workspaces', (req, res) => {
+    try {
+        const workspaces = db.prepare('SELECT * FROM workspaces ORDER BY created_at DESC').all();
+        res.json(workspaces);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: 'Failed to fetch workspaces' });
+    }
+});
+
+app.get('/api/workspaces/:id', (req, res) => {
+    const workspace = db.prepare('SELECT * FROM workspaces WHERE id = ?').get(req.params.id);
+    if (workspace) res.json(workspace);
+    else res.status(404).json({ error: 'Workspace not found' });
+});
+
+// USERS (Admin Only in real world)
+app.get('/api/users', (req, res) => {
+    try {
+        const users = db.prepare('SELECT id, name, email, role FROM users ORDER BY id DESC').all();
+        res.json(users);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: 'Failed to fetch users' });
+    }
 });
 
 app.listen(port, () => {

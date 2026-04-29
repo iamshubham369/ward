@@ -5,7 +5,7 @@ import { Moon, Sun, Search, LogOut, ShieldCheck, User, Menu, X, ChevronDown, Glo
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = ({ onOpenLogin }) => {
-    const { language, setLanguage, darkMode, setDarkMode, user, logout, view, setView } = useContext(AppContext);
+    const { language, setLanguage, darkMode, setDarkMode, user, logout, view, setView, currentWorkspace } = useContext(AppContext);
     const { t, i18n } = useTranslation();
     const [mobileOpen, setMobileOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('hero');
@@ -25,6 +25,7 @@ const Navbar = ({ onOpenLogin }) => {
         ...(!user || user.role === 'Citizen' ? [{ id: 'report', key: 'navbar.report_issue' }] : []),
         { id: 'buzz', key: 'navbar.ward_buzz' },
         { id: 'projects', key: 'navbar.projects' },
+        { id: 'report-card', key: 'navbar.report_card', view: 'report-card', label: 'Report Card' },
     ];
 
     const MoreItems = [
@@ -52,7 +53,8 @@ const Navbar = ({ onOpenLogin }) => {
     }, [view]);
 
     const getTranslation = (item) => {
-        return t(item.key);
+        const trans = t(item.key);
+        return trans === item.key ? (item.label || trans) : trans;
     };
 
     return (
@@ -64,20 +66,31 @@ const Navbar = ({ onOpenLogin }) => {
                         className="flex items-center gap-3 shrink-0 hover:opacity-80 transition-opacity"
                     >
                         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded bg-saffron-500 flex items-center justify-center shadow-lg shadow-saffron-500/20">
-                            <span className="text-navy-900 font-mono font-bold text-sm sm:text-base">14</span>
+                            <span className="text-navy-900 font-mono font-bold text-sm sm:text-base">
+                                {currentWorkspace ? (currentWorkspace.ward_name.replace(/[^0-9]/g, '') || currentWorkspace.ward_name.charAt(0)) : '14'}
+                            </span>
                         </div>
                         <div className="hidden sm:block text-left">
-                            <span className="block font-display font-black text-stone-100 text-sm tracking-tight leading-none">{t('navbar.ward_civic')}</span>
+                            <span className="block font-display font-black text-stone-100 text-sm tracking-tight leading-none">
+                                {currentWorkspace ? `${currentWorkspace.city} Civic` : t('navbar.ward_civic')}
+                            </span>
                             <span className="block font-mono text-[9px] text-saffron-400 uppercase tracking-widest mt-0.5">{t('navbar.intelligence_portal')}</span>
                         </div>
                     </button>
                     
-                    <div className="hidden xl:flex items-center gap-0.5">
+                    <div className="hidden xl:flex items-center gap-6">
                         {NavItems.map(item => (
                             <a 
                                 key={item.id} 
-                                href={`#${item.id}`} 
-                                onClick={() => setView('map')}
+                                href={item.view ? '#' : `#${item.id}`}
+                                onClick={(e) => {
+                                    if (item.view) {
+                                        e.preventDefault();
+                                        setView(item.view);
+                                    } else {
+                                        setView('map');
+                                    }
+                                }}
                                 className={`px-4 py-2 text-[10px] font-mono font-black transition-all uppercase tracking-widest relative group/nav ${activeSection === item.id ? 'text-saffron-500' : 'text-stone-300/80 hover:text-white'}`}
                             >
                                 {getTranslation(item)}
@@ -119,10 +132,7 @@ const Navbar = ({ onOpenLogin }) => {
                         </div>
                     </div>
 
-                    <div className="relative hidden md:block max-w-sm w-full group">
-                        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-500 w-4 h-4 transition-colors group-focus-within:text-saffron-500" />
-                        <input type="text" placeholder={t('navbar.search_placeholder')} className="w-full bg-navy-900/50 border border-navy-600/30 rounded-full py-2.5 pl-10 pr-4 text-xs text-stone-200 placeholder:text-stone-600 outline-none focus:border-saffron-500/50 focus:ring-4 focus:ring-saffron-500/5 transition-all" />
-                    </div>
+
                 </div>
 
                 <div className="flex items-center gap-3 sm:gap-5">

@@ -8,7 +8,7 @@ import { Doughnut } from 'react-chartjs-2';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Hero = () => {
-    const { issues, projects } = useContext(AppContext);
+    const { issues, projects, currentWorkspace } = useContext(AppContext);
     const { t } = useTranslation();
 
     const stats = [
@@ -43,21 +43,23 @@ const Hero = () => {
             
             <div className="relative max-w-7xl mx-auto px-4 sm:px-6 w-full flex flex-col items-center lg:items-start">
                 <div className="mb-6 text-center lg:text-left">
-                    <span className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-400 font-semibold border border-saffron-500/30 px-3 py-1 rounded-full">{t('hero.nmc')}</span>
+                    <span className="inline-block font-mono text-[10px] tracking-[0.3em] uppercase text-saffron-400 font-semibold border border-saffron-500/30 px-3 py-1 rounded-full">
+                        {currentWorkspace ? `${currentWorkspace.city} MUNICIPAL CORPORATION` : t('hero.nmc')}
+                    </span>
                 </div>
 
                 <div className="grid lg:grid-cols-5 gap-12 items-center w-full">
                     <div className="lg:col-span-3 text-center lg:text-left">
                         <h1 className="font-display font-black text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-stone-50 leading-[0.95] tracking-tight mb-4">
-                            <span>{t('hero.ward_14')}</span>
+                            <span>{currentWorkspace ? currentWorkspace.ward_name : t('hero.ward_14')}</span>
                         </h1>
                         <p className="font-display text-xl sm:text-2xl text-stone-300/80 mb-6 italic">
-                            Dharampeth, Nagpur
+                            {currentWorkspace ? currentWorkspace.ward_description || currentWorkspace.city : 'Dharampeth, Nagpur'}
                         </p>
 
                         <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-stone-400 mb-8 justify-center lg:justify-start">
-                            <span className="flex items-center gap-2"><UserCheck className="w-4 h-4 text-saffron-500/60" /> {t('hero.councillor')}: Smt. Priya Deshmukh</span>
-                            <span className="flex items-center gap-2"><Users className="w-4 h-4 text-saffron-500/60" /> {t('hero.population')}: ~48,200</span>
+                            <span className="flex items-center gap-2"><UserCheck className="w-4 h-4 text-saffron-500/60" /> {t('hero.councillor')}: {currentWorkspace?.admin_name || 'Smt. Priya Deshmukh'}</span>
+                            <span className="flex items-center gap-2"><Users className="w-4 h-4 text-saffron-500/60" /> {t('hero.population')}: ~{currentWorkspace?.population_estimate?.toLocaleString() || '48,200'}</span>
                             <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-saffron-500/60" /> {t('hero.last_sync')}</span>
                         </div>
 
