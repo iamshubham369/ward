@@ -1,6 +1,20 @@
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
-const db = new Database(path.join(__dirname, 'database.db'));
+const dbInstance = new DatabaseSync(path.join(__dirname, 'database.db'));
+
+// Wrapper to mimic better-sqlite3 API
+const db = {
+    exec: (sql) => dbInstance.exec(sql),
+    prepare: (sql) => {
+        const stmt = dbInstance.prepare(sql);
+        return {
+            run: (...args) => stmt.run(...args),
+            get: (...args) => stmt.all(...args)[0],
+            all: (...args) => stmt.all(...args)
+        };
+    },
+    close: () => {} // node:sqlite handles closing or doesn't have a closeSync in all versions
+};
 
 const workspaces = [
     { id: 'nagpur', city: 'Nagpur', ward: 'Ward 14', admin: 'admin@ward14.in', theme: 'Tactical Dark', pop: 45000, desc: 'Central logistics and residential hub.' },
@@ -44,11 +58,22 @@ const notifications = [
     { wid: 'mumbai', text: 'Monsoon readiness audit completed for Ward D.', icon: 'CheckCircle', color: 'text-emerald-500' }
 ];
 
+const archive_records = [
+    { id: 'RTI-2025-001', subject: 'MG Road Fund Allocation Ledger', status: 'Disclosed', date: '2025-09-12', wid: 'nagpur' },
+    { id: 'RTI-2025-004', subject: 'Ward 14 Sanitation Contract Specs', status: 'Disclosed', date: '2025-10-05', wid: 'nagpur' },
+    { id: 'RTI-2025-009', subject: 'Public Park Land Survey 2024', status: 'Under Review', date: '2025-11-20', wid: 'nagpur' }
+];
+
+const project_ledger = [
+    { pid: 1, img: '/uploads/road1.png', cap: 'Sub-surface layering initiation at MG Road.', wid: 'nagpur' },
+    { pid: 2, img: '/uploads/water1.png', cap: 'New 48-inch pipeline arrival at Amravati Road.', wid: 'nagpur' }
+];
+
 function seed() {
     console.log('--- WARDPULSE OS SEEDING PROTOCOL INITIATED ---');
 
     try {
-        db.exec('DELETE FROM workspaces; DELETE FROM users; DELETE FROM projects; DELETE FROM issues; DELETE FROM notifications;');
+        db.exec('DELETE FROM workspaces; DELETE FROM users; DELETE FROM projects; DELETE FROM issues; DELETE FROM notifications; DELETE FROM archive_records; DELETE FROM project_ledger;');
         console.log('Data Purge: Complete.');
 
         const insertWorkspace = db.prepare('INSERT INTO workspaces (id, city, ward_name, admin_email, theme, population_estimate, ward_description) VALUES (?, ?, ?, ?, ?, ?, ?)');
@@ -70,6 +95,14 @@ function seed() {
         const insertNotification = db.prepare('INSERT INTO notifications (workspace_id, text, icon, color) VALUES (?, ?, ?, ?)');
         notifications.forEach(n => insertNotification.run(n.wid, n.text, n.icon, n.color));
         console.log('Notifications: Broadcasted.');
+
+        const insertArchive = db.prepare('INSERT INTO archive_records (id, subject, status, disclosure_date, workspace_id) VALUES (?, ?, ?, ?, ?)');
+        archive_records.forEach(a => insertArchive.run(a.id, a.subject, a.status, a.date, a.wid));
+        console.log('Archive: Disclosed.');
+
+        const insertLedger = db.prepare('INSERT INTO project_ledger (project_id, image_path, caption, workspace_id) VALUES (?, ?, ?, ?)');
+        project_ledger.forEach(l => insertLedger.run(l.pid, l.img, l.cap, l.wid));
+        console.log('Ledger: Visualized.');
 
         console.log('--- SEEDING PROTOCOL SUCCESSFUL ---');
     } catch (error) {

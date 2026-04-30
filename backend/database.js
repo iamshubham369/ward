@@ -1,7 +1,20 @@
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 
-const db = new Database(path.join(__dirname, 'database.db'));
+// Initialize built-in synchronous SQLite (available in Node 22.5+)
+const db = new DatabaseSync(path.join(__dirname, 'database.db'));
+
+// Helper to mimic better-sqlite3's prepare().get() and prepare().run()
+// as node:sqlite's prepare() returns an object with similar but slightly different methods
+const originalPrepare = db.prepare.bind(db);
+db.prepare = (sql) => {
+    const stmt = originalPrepare(sql);
+    return {
+        run: (...args) => stmt.run(...args),
+        get: (...args) => stmt.all(...args)[0],
+        all: (...args) => stmt.all(...args)
+    };
+};
 
 // Create tables with FULL schema initially
 db.exec(`
@@ -80,17 +93,39 @@ db.exec(`
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
         workspace_id TEXT DEFAULT 'nagpur'
     );
+
+    CREATE TABLE IF NOT EXISTS archive_records (
+        id TEXT PRIMARY KEY,
+        subject TEXT,
+        status TEXT,
+        disclosure_date TEXT,
+        file_path TEXT,
+        workspace_id TEXT DEFAULT 'nagpur'
+    );
+
+    CREATE TABLE IF NOT EXISTS project_ledger (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER,
+        image_path TEXT,
+        caption TEXT,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        workspace_id TEXT DEFAULT 'nagpur'
+    );
 `);
 
 // MIGRATION: Security columns for users
 try {
     db.prepare('ALTER TABLE users ADD COLUMN security_question TEXT').run();
+} catch (e) {}
+try {
     db.prepare('ALTER TABLE users ADD COLUMN security_answer TEXT').run();
 } catch (e) {}
 
 // MIGRATION: Project details
 try {
     db.prepare('ALTER TABLE projects ADD COLUMN allocation_details TEXT DEFAULT "{}"').run();
+} catch (e) {}
+try {
     db.prepare('ALTER TABLE projects ADD COLUMN fund_usage REAL DEFAULT 0').run();
 } catch (e) {}
 
@@ -110,28 +145,27 @@ try { db.prepare('ALTER TABLE notifications ADD COLUMN workspace_id TEXT DEFAULT
 // MIGRATION: Workspace metadata
 try {
     db.prepare('ALTER TABLE workspaces ADD COLUMN admin_name TEXT').run();
-    db.prepare('ALTER TABLE workspaces ADD COLUMN population_estimate INTEGER').run();
-    db.prepare('ALTER TABLE workspaces ADD COLUMN ward_description TEXT').run();
-    db.prepare('ALTER TABLE workspaces ADD COLUMN contact_number TEXT').run();
 } catch (e) {}
-
-// MIGRATION: Add additional fields to workspaces
 try {
-    db.prepare('ALTER TABLE workspaces ADD COLUMN admin_name TEXT').run();
     db.prepare('ALTER TABLE workspaces ADD COLUMN population_estimate INTEGER').run();
+} catch (e) {}
+try {
     db.prepare('ALTER TABLE workspaces ADD COLUMN ward_description TEXT').run();
+} catch (e) {}
+try {
     db.prepare('ALTER TABLE workspaces ADD COLUMN contact_number TEXT').run();
-    console.log('Database Migration: Workspace Metadata Columns Activated.');
 } catch (e) {}
 
 // Seed initial data if empty
-const userCount = db.prepare('SELECT count(*) as count FROM users').get().count;
+const userCountRes = db.prepare('SELECT count(*) as count FROM users').get();
+const userCount = userCountRes ? userCountRes.count : 0;
 if (userCount === 0) {
     db.prepare('INSERT INTO users (email, password, name, role, security_question, security_answer) VALUES (?, ?, ?, ?, ?, ?)').run('citizen@ward14.in', 'citizen123', 'Ankit Mishra', 'Citizen', 'Favorite City', 'Nagpur');
     db.prepare('INSERT INTO users (email, password, name, role, security_question, security_answer) VALUES (?, ?, ?, ?, ?, ?)').run('admin@ward14.in', 'admin123', 'Smt. Priya Deshmukh', 'Authority', 'Portal Node', 'Ward-14');
 }
 
-const workspaceCount = db.prepare('SELECT count(*) as count FROM workspaces').get().count;
+const workspaceCountRes = db.prepare('SELECT count(*) as count FROM workspaces').get();
+const workspaceCount = workspaceCountRes ? workspaceCountRes.count : 0;
 if (workspaceCount === 0) {
     db.prepare('INSERT INTO workspaces (id, city, ward_name, admin_email, theme) VALUES (?, ?, ?, ?, ?)').run('nagpur', 'Nagpur', 'Ward 14', 'admin@ward14.in', 'Tactical Dark');
 }

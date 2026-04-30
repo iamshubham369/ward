@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { 
     ChevronLeft, IndianRupee, Calendar, HardHat, TrendingUp, 
     AlertTriangle, CheckCircle2, Save, Edit3, PieChart, 
-    Layers, Download, History, ArrowRight, Loader2
+    Layers, Download, History, ArrowRight, Loader2, Image as ImageIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 const ProjectDetails = ({ projectId, onBack }) => {
     const { projects, user, updateProject, showToast, language } = useContext(AppContext);
@@ -15,6 +16,8 @@ const ProjectDetails = ({ projectId, onBack }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(false);
     const [editForm, setEditForm] = useState(null);
+    const [ledger, setLedger] = useState([]);
+    const [loadingLedger, setLoadingLedger] = useState(true);
 
     useEffect(() => {
         const p = projects.find(p => p.id === projectId);
@@ -32,6 +35,19 @@ const ProjectDetails = ({ projectId, onBack }) => {
                 ...p,
                 allocation_details: details
             });
+
+            // Fetch Ledger
+            const fetchLedger = async () => {
+                try {
+                    const res = await axios.get(`http://localhost:5000/api/projects/ledger/${projectId}`);
+                    setLedger(res.data);
+                } catch (e) {
+                    console.error("Ledger Fetch Error:", e);
+                } finally {
+                    setLoadingLedger(false);
+                }
+            };
+            fetchLedger();
         }
     }, [projectId, projects]);
 
@@ -125,7 +141,6 @@ const ProjectDetails = ({ projectId, onBack }) => {
                                         <PieChart className="w-4 h-4 text-saffron-500" /> {t('details.resource')}
                                     </h3>
                                     
-                                    {/* INVOICE STYLE LEDGER */}
                                     <div className="bg-stone-50 dark:bg-navy-950/50 rounded-3xl p-8 border border-stone-200 dark:border-navy-800 space-y-6">
                                         {allocationItems.map(([item, percent]) => (
                                             <div key={item} className="space-y-3">
@@ -144,6 +159,45 @@ const ProjectDetails = ({ projectId, onBack }) => {
                                         ))}
                                     </div>
                                 </div>
+                            </div>
+                        </motion.div>
+
+                        {/* Image Ledger Section */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="bg-white dark:bg-navy-900 rounded-[3rem] p-12 shadow-2xl border border-stone-200 dark:border-navy-800"
+                        >
+                            <h3 className="text-xs font-mono font-black text-stone-400 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
+                                <ImageIcon className="w-4 h-4 text-saffron-500" /> {t('details.ledger') || 'Image Ledger'}
+                            </h3>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                {loadingLedger ? (
+                                    <div className="col-span-2 py-12 text-center">
+                                        <Loader2 className="w-8 h-8 animate-spin text-saffron-500 mx-auto" />
+                                    </div>
+                                ) : ledger.length > 0 ? (
+                                    ledger.map((item, idx) => (
+                                        <div key={idx} className="group/ledger relative rounded-3xl overflow-hidden border border-stone-100 dark:border-navy-800 bg-stone-50 dark:bg-navy-950">
+                                            <img 
+                                                src={`http://localhost:5000${item.image_path}`} 
+                                                alt={item.caption}
+                                                className="w-full h-48 object-cover group-hover/ledger:scale-110 transition-transform duration-700"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-transparent to-transparent opacity-80"></div>
+                                            <div className="absolute bottom-0 left-0 right-0 p-6">
+                                                <div className="text-[9px] font-mono font-black text-saffron-500 uppercase tracking-widest mb-1">{new Date(item.timestamp).toLocaleDateString()}</div>
+                                                <p className="text-xs text-stone-200 font-medium leading-relaxed">{item.caption}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="col-span-2 py-12 text-center text-stone-400 font-mono text-[10px] uppercase tracking-widest border-2 border-dashed border-stone-100 dark:border-navy-800 rounded-3xl">
+                                        No visual logs protocolled for this project node.
+                                    </div>
+                                )}
                             </div>
                         </motion.div>
                     </div>
@@ -193,12 +247,6 @@ const ProjectDetails = ({ projectId, onBack }) => {
                                         </div>
                                     </div>
                                 )}
-
-                                <div className="pt-6 border-t border-navy-800">
-                                    <button className="w-full bg-navy-800 hover:bg-navy-700 text-stone-300 py-4 rounded-2xl text-[9px] font-mono font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3">
-                                        {t('details.ledger')} <ArrowRight className="w-3 h-3" />
-                                    </button>
-                                </div>
                             </div>
                         </div>
 
@@ -214,7 +262,6 @@ const ProjectDetails = ({ projectId, onBack }) => {
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     );

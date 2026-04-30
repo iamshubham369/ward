@@ -195,6 +195,20 @@ app.post('/api/notifications', (req, res) => {
     res.json({ success: true });
 });
 
+// ARCHIVE
+app.get('/api/archive', (req, res) => {
+    const { workspace_id } = req.query;
+    const records = db.prepare('SELECT * FROM archive_records WHERE workspace_id = ? ORDER BY disclosure_date DESC').all(workspace_id || 'nagpur');
+    res.json(records);
+});
+
+// PROJECT LEDGER
+app.get('/api/projects/ledger/:id', (req, res) => {
+    const { id } = req.params;
+    const ledger = db.prepare('SELECT * FROM project_ledger WHERE project_id = ? ORDER BY timestamp DESC').all(id);
+    res.json(ledger);
+});
+
 // WORKSPACES
 app.post('/api/workspaces', (req, res) => {
     const { id, city, ward_name, admin_email, theme, admin_name, population_estimate, ward_description, contact_number } = req.body;
@@ -257,13 +271,15 @@ app.listen(port, () => {
     console.log(`Backend server running on http://localhost:${port}`);
 
     // Seed initial projects if empty
-    const projectCount = db.prepare('SELECT count(*) as count FROM projects').get().count;
-    if (projectCount === 0) {
-        db.prepare(`
-            INSERT INTO projects (name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, progress, status, lat, lng)
-            VALUES 
-            ('MG Road Resurfacing', 'एमजी रोड पुनर्संयोजन', 'एमजी रोड पुनरुज्जीवन', 'Roads', 'PWD', 240, '2025-06-01', '2025-08-15', 'Sharma Infrastructure', 45, 'On-Track', 21.146, 79.088),
-            ('New Water Pipeline', 'नई जल पाइपलाइन', 'नवीन पाणी पाईपलाईन', 'Water Supply', 'Water Board', 180, '2025-05-15', '2025-09-10', 'Global Pipes Ltd', 25, 'Delayed', 21.144, 79.086)
-        `).run();
-    }
+    try {
+        const projectCount = db.prepare('SELECT count(*) as count FROM projects').get().count;
+        if (projectCount === 0) {
+            db.prepare(`
+                INSERT INTO projects (name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, progress, status, lat, lng)
+                VALUES 
+                ('MG Road Resurfacing', 'एमजी रोड पुनर्संयोजन', 'एमजी रोड पुनरुज्जीवन', 'Roads', 'PWD', 240, '2025-06-01', '2025-08-15', 'Sharma Infrastructure', 45, 'On-Track', 21.146, 79.088),
+                ('New Water Pipeline', 'नई जल पाइपलाइन', 'नवीन पाणी पाईपलाईन', 'Water Supply', 'Water Board', 180, '2025-05-15', '2025-09-10', 'Global Pipes Ltd', 25, 'Delayed', 21.144, 79.086)
+            `).run();
+        }
+    } catch (e) {}
 });
