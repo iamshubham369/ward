@@ -111,6 +111,40 @@ db.exec(`
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
         workspace_id TEXT DEFAULT 'nagpur'
     );
+
+    CREATE TABLE IF NOT EXISTS community_posts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        author_name TEXT,
+        author_role TEXT DEFAULT 'Citizen',
+        category TEXT,
+        content TEXT,
+        upvotes INTEGER DEFAULT 0,
+        ai_tag TEXT,
+        ai_accuracy INTEGER,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        workspace_id TEXT DEFAULT 'nagpur'
+    );
+
+    CREATE TABLE IF NOT EXISTS community_replies (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        post_id INTEGER,
+        author_name TEXT,
+        author_role TEXT DEFAULT 'Citizen',
+        content TEXT,
+        is_official INTEGER DEFAULT 0,
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(post_id) REFERENCES community_posts(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        sender_id INTEGER,
+        receiver_id INTEGER,
+        content TEXT,
+        type TEXT DEFAULT 'direct', -- 'direct' or 'broadcast'
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        workspace_id TEXT DEFAULT 'nagpur'
+    );
 `);
 
 // MIGRATION: Security columns for users

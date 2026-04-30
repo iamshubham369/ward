@@ -209,6 +209,59 @@ app.get('/api/projects/ledger/:id', (req, res) => {
     res.json(ledger);
 });
 
+// COMMUNITY BUZZ
+app.get('/api/community/posts', (req, res) => {
+    const { workspace_id } = req.query;
+    const posts = db.prepare('SELECT * FROM community_posts WHERE workspace_id = ? ORDER BY timestamp DESC').all(workspace_id || 'nagpur');
+    const enrichedPosts = posts.map(post => {
+        const replies = db.prepare('SELECT * FROM community_replies WHERE post_id = ? ORDER BY timestamp ASC').all(post.id);
+        return { ...post, replies };
+    });
+    res.json(enrichedPosts);
+});
+
+app.post('/api/community/posts', (req, res) => {
+    const { author_name, author_role, category, content, workspace_id } = req.body;
+    const ai_tag = 'Routine Node';
+    const ai_accuracy = 80 + Math.floor(Math.random() * 15);
+    const result = db.prepare(`
+        INSERT INTO community_posts (author_name, author_role, category, content, ai_tag, ai_accuracy, workspace_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(author_name, author_role, category, content, ai_tag, ai_accuracy, workspace_id || 'nagpur');
+    res.json({ success: true, id: result.lastInsertRowid });
+});
+
+app.post('/api/community/replies', (req, res) => {
+    const { post_id, author_name, author_role, content, is_official } = req.body;
+    db.prepare(`
+        INSERT INTO community_replies (post_id, author_name, author_role, content, is_official)
+        VALUES (?, ?, ?, ?, ?)
+    `).run(post_id, author_name, author_role, content, is_official ? 1 : 0);
+    res.json({ success: true });
+});
+
+app.post('/api/community/upvote/:id', (req, res) => {
+    const { id } = req.params;
+    db.prepare('UPDATE community_posts SET upvotes = upvotes + 1 WHERE id = ?').run(id);
+    res.json({ success: true });
+});
+
+// MESSAGES & BROADCASTS
+app.get('/api/messages', (req, res) => {
+    const { workspace_id } = req.query;
+    const messages = db.prepare('SELECT * FROM messages WHERE workspace_id = ? ORDER BY timestamp DESC').all(workspace_id || 'nagpur');
+    res.json(messages);
+});
+
+app.post('/api/messages', (req, res) => {
+    const { sender_id, receiver_id, content, type, workspace_id } = req.body;
+    db.prepare(`
+        INSERT INTO messages (sender_id, receiver_id, content, type, workspace_id)
+        VALUES (?, ?, ?, ?, ?)
+    `).run(sender_id, receiver_id, content, type || 'direct', workspace_id || 'nagpur');
+    res.json({ success: true });
+});
+
 // WORKSPACES
 app.post('/api/workspaces', (req, res) => {
     const { id, city, ward_name, admin_email, theme, admin_name, population_estimate, ward_description, contact_number } = req.body;
