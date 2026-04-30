@@ -3,56 +3,18 @@ const path = require('path');
 
 const db = new Database(path.join(__dirname, 'database.db'));
 
-// Create tables with Migration Logic
+// Create tables with FULL schema initially
 db.exec(`
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE,
         password TEXT,
         name TEXT,
-        role TEXT
+        role TEXT,
+        security_question TEXT,
+        security_answer TEXT
     );
-`);
 
-// MIGRATION: Add security columns if they don't exist
-try {
-    db.prepare('ALTER TABLE users ADD COLUMN security_question TEXT').run();
-    db.prepare('ALTER TABLE users ADD COLUMN security_answer TEXT').run();
-    console.log('Database Migration: Security Columns Activated.');
-} catch (e) {}
-
-try {
-    db.prepare('ALTER TABLE projects ADD COLUMN allocation_details TEXT DEFAULT "{}"').run();
-    db.prepare('ALTER TABLE projects ADD COLUMN fund_usage REAL DEFAULT 0').run();
-    console.log('Database Migration: Project Allocation Node Synchronized.');
-} catch (e) {}
-
-// MIGRATION: Add tri-lingual columns to issues
-const issueCols = ['street_hi', 'street_mr', 'landmark_hi', 'landmark_mr', 'description_hi', 'description_mr'];
-issueCols.forEach(col => {
-    try {
-        db.prepare(`ALTER TABLE issues ADD COLUMN ${col} TEXT`).run();
-        console.log(`Database Migration: Issue Column ${col} Synchronized.`);
-    } catch (e) {}
-});
-
-// MIGRATION: Add workspace isolation to issues and projects
-try {
-    db.prepare('ALTER TABLE issues ADD COLUMN workspace_id TEXT DEFAULT "nagpur"').run();
-    console.log('Database Migration: Issues Workspace Node Synchronized.');
-} catch (e) {}
-
-try {
-    db.prepare('ALTER TABLE projects ADD COLUMN workspace_id TEXT DEFAULT "nagpur"').run();
-    console.log('Database Migration: Projects Workspace Node Synchronized.');
-} catch (e) {}
-
-try {
-    db.prepare('ALTER TABLE notifications ADD COLUMN workspace_id TEXT DEFAULT "nagpur"').run();
-    console.log('Database Migration: Notifications Workspace Node Synchronized.');
-} catch (e) {}
-
-db.exec(`
     CREATE TABLE IF NOT EXISTS issues (
         id TEXT PRIMARY KEY,
         category TEXT,
@@ -73,11 +35,12 @@ db.exec(`
         upvotes INTEGER DEFAULT 0,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
         lat REAL,
-        lng REAL
+        lng REAL,
+        workspace_id TEXT DEFAULT 'nagpur'
     );
 
     CREATE TABLE IF NOT EXISTS projects (
-        id INTEGER PRIMARY KEY,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
         name_en TEXT,
         name_hi TEXT,
         name_mr TEXT,
@@ -92,7 +55,8 @@ db.exec(`
         progress INTEGER DEFAULT 0,
         status TEXT DEFAULT 'On-Track',
         lat REAL,
-        lng REAL
+        lng REAL,
+        workspace_id TEXT DEFAULT 'nagpur'
     );
 
     CREATE TABLE IF NOT EXISTS workspaces (
@@ -101,6 +65,10 @@ db.exec(`
         ward_name TEXT,
         admin_email TEXT,
         theme TEXT,
+        admin_name TEXT,
+        population_estimate INTEGER,
+        ward_description TEXT,
+        contact_number TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -109,9 +77,43 @@ db.exec(`
         text TEXT,
         icon TEXT,
         color TEXT,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        workspace_id TEXT DEFAULT 'nagpur'
     );
 `);
+
+// MIGRATION: Security columns for users
+try {
+    db.prepare('ALTER TABLE users ADD COLUMN security_question TEXT').run();
+    db.prepare('ALTER TABLE users ADD COLUMN security_answer TEXT').run();
+} catch (e) {}
+
+// MIGRATION: Project details
+try {
+    db.prepare('ALTER TABLE projects ADD COLUMN allocation_details TEXT DEFAULT "{}"').run();
+    db.prepare('ALTER TABLE projects ADD COLUMN fund_usage REAL DEFAULT 0').run();
+} catch (e) {}
+
+// MIGRATION: Tri-lingual columns to issues
+const issueCols = ['street_hi', 'street_mr', 'landmark_hi', 'landmark_mr', 'description_hi', 'description_mr'];
+issueCols.forEach(col => {
+    try {
+        db.prepare(`ALTER TABLE issues ADD COLUMN ${col} TEXT`).run();
+    } catch (e) {}
+});
+
+// MIGRATION: Workspace isolation
+try { db.prepare('ALTER TABLE issues ADD COLUMN workspace_id TEXT DEFAULT "nagpur"').run(); } catch (e) {}
+try { db.prepare('ALTER TABLE projects ADD COLUMN workspace_id TEXT DEFAULT "nagpur"').run(); } catch (e) {}
+try { db.prepare('ALTER TABLE notifications ADD COLUMN workspace_id TEXT DEFAULT "nagpur"').run(); } catch (e) {}
+
+// MIGRATION: Workspace metadata
+try {
+    db.prepare('ALTER TABLE workspaces ADD COLUMN admin_name TEXT').run();
+    db.prepare('ALTER TABLE workspaces ADD COLUMN population_estimate INTEGER').run();
+    db.prepare('ALTER TABLE workspaces ADD COLUMN ward_description TEXT').run();
+    db.prepare('ALTER TABLE workspaces ADD COLUMN contact_number TEXT').run();
+} catch (e) {}
 
 // MIGRATION: Add additional fields to workspaces
 try {

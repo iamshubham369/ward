@@ -81,7 +81,7 @@ const resources = {
         population_val: "~48,200",
         last_sync: "Last sync: 3 min ago",
         ward_health: "Ward Health Score",
-        stellar: "Stellar",
+        stellar: "Excellent",
         resolution: "Resolution",
         on_time: "On-Time",
         satisfaction: "Satisfaction",

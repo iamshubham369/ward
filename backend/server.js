@@ -151,12 +151,17 @@ app.get('/api/projects', (req, res) => {
 });
 
 app.post('/api/projects', (req, res) => {
-    const { name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details, workspace_id } = req.body;
-    db.prepare(`
-        INSERT INTO projects (name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details, workspace_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details || '{}', workspace_id || 'nagpur');
-    res.json({ success: true });
+    try {
+        const { name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details, workspace_id } = req.body;
+        db.prepare(`
+            INSERT INTO projects (name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details, workspace_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(name_en, name_hi, name_mr, category, dept_en, budget, start_date, deadline, contractor, lat, lng, allocation_details || '{}', workspace_id || 'nagpur');
+        res.json({ success: true });
+    } catch (error) {
+        console.error('CRITICAL: Project Genesis Failure:', error);
+        res.status(500).json({ success: false, message: 'Project node rejected by database', error: error.message });
+    }
 });
 
 app.get('/api/projects/:id', (req, res) => {

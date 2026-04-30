@@ -41,3 +41,21 @@ body { font-family: 'DM Sans', sans-serif; transition: background-color 0.5s eas
 }
 
 .resolved-stamp { position:absolute; top:10px; right:10px; border:3px solid #22C55E; color:#22C55E; padding:1px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; transform:rotate(4deg); letter-spacing:0.5px; }
+
+@keyframes scan {
+    0% { top: 0%; opacity: 0; }
+    5% { opacity: 1; }
+    95% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+
+.animate-scan {
+    animation: scan 4s linear infinite;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+    background: rgba(15, 27, 45, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}

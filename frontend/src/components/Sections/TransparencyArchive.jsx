@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { FileStack, Table, Filter, Download, ExternalLink, ShieldCheck, ChevronRight } from 'lucide-react';
 
 const TransparencyArchive = () => {
-    const { language } = useContext(AppContext);
+    const { language, showToast } = useContext(AppContext);
     const { t } = useTranslation();
 
     const rtiRecords = [
@@ -28,7 +28,11 @@ const TransparencyArchive = () => {
                         <h3 className="text-xs font-mono font-black text-navy-800 dark:text-stone-300 uppercase tracking-widest mb-6 flex items-center justify-between">{t('archive.log')} <Table className="w-4 h-4 text-saffron-500" /></h3>
                         <div className="space-y-4">
                             {rtiRecords.map(rec => (
-                                <div key={rec.id} className="p-4 rounded-2xl bg-stone-50 dark:bg-navy-800 border border-stone-100 dark:border-navy-700 hover:border-saffron-500/50 transition-all group/item cursor-pointer">
+                                <div 
+                                    key={rec.id} 
+                                    onClick={() => showToast(`Downloading Public Disclosure Node: ${rec.id}. PDF Protocol Initiated.`, 'success')}
+                                    className="p-4 rounded-2xl bg-stone-50 dark:bg-navy-800 border border-stone-100 dark:border-navy-700 hover:border-saffron-500/50 transition-all group/item cursor-pointer"
+                                >
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-[10px] font-mono font-bold text-saffron-500">{rec.id}</span>
                                         <span className={`text-[9px] font-mono px-2 py-0.5 rounded-lg border ${rec.status === t('archive.disclosed') ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' : 'bg-saffron-500/10 text-saffron-500 border-saffron-500/20'}`}>{rec.status}</span>
@@ -43,17 +47,22 @@ const TransparencyArchive = () => {
                         </div>
                     </div>
                     
-                    <div className="bg-navy-900 rounded-3xl p-10 text-stone-50 relative overflow-hidden group border border-navy-800">
+                    <div className="bg-navy-900 rounded-3xl p-10 text-stone-50 relative overflow-hidden group border border-navy-800 shadow-2xl">
                         <div className="relative z-10">
                             <ShieldCheck className="w-12 h-12 text-saffron-500 mb-6 group-hover:scale-110 transition-transform" />
                             <h3 className="font-display font-black text-3xl mb-4 tracking-tight uppercase">{t('archive.protocol')}</h3>
                             <p className="text-xs text-stone-400 font-bold uppercase tracking-widest mb-10 leading-relaxed max-w-[280px]">
-                                {t('archive.desc')}
+                                {t('archive.desc') || 'Submit a formal Right to Information request via the central municipal mandate portal.'}
                             </p>
-                            <button className="bg-saffron-500 text-navy-900 px-8 py-4 rounded-xl text-[10px] font-mono font-black uppercase tracking-[0.3em] hover:bg-saffron-400 transition-all flex items-center gap-3 group/btn">
+                            <a 
+                                href="https://rtionline.gov.in/" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex bg-saffron-500 text-navy-900 px-8 py-4 rounded-xl text-[10px] font-mono font-black uppercase tracking-[0.3em] hover:bg-saffron-400 transition-all items-center gap-3 group/btn"
+                            >
                                 {t('archive.initiate')}
                                 <ChevronRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
-                            </button>
+                            </a>
                         </div>
                         <div className="absolute top-0 right-0 w-48 h-48 bg-saffron-500/5 rounded-full -translate-y-16 translate-x-16 blur-2xl"></div>
                     </div>
